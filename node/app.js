@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
+var dateFormat = require('dateformat');
 
 const app = express();
 
@@ -53,7 +54,7 @@ con.connect(function (err) {
         console.log("Table Users Created");
     });
 
-    var CompetitionsTb = "CREATE TABLE if not exists competitions (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(20) NOT NULL UNIQUE, totalParticipants INT(2) NOT NULL, numberHelps INT(2) NOT NULL, discountPerHelp INT(2) NOT NULL, estado VARCHAR(15) NOT NULL)";
+    var CompetitionsTb = "CREATE TABLE if not exists competitions (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(20) NOT NULL UNIQUE, totalParticipants INT(2) NOT NULL, numberHelps INT(2) NOT NULL, discountPerHelp INT(2) NOT NULL, status VARCHAR(15) NOT NULL)";
     con.query(CompetitionsTb, function (err, result) {
         if (err) throw err;
         console.log("Table Competitions Created");
@@ -71,7 +72,7 @@ con.connect(function (err) {
         console.log("Table ChallengesPerCompetition Created");
     });
 
-    var RegistrationsTb = "CREATE TABLE if not exists registrations (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL, competitionID INT NOT NULL, FOREIGN KEY (userID) REFERENCES users(id), FOREIGN KEY (competitionID) REFERENCES competitions(id), registrationDate DATETIME NOT NULL)";
+    var RegistrationsTb = "CREATE TABLE if not exists registrations (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL, competitionID INT NOT NULL, FOREIGN KEY (userID) REFERENCES users(id), FOREIGN KEY (competitionID) REFERENCES competitions(id), registrationDate DATE NOT NULL)";
     con.query(RegistrationsTb, function (err, result) {
         if (err) throw err;
         console.log("Table Registrations Created");
@@ -86,6 +87,8 @@ con.connect(function (err) {
 
     //Methods DB
 
+    // USER METHODS -------------------------------------------------------------------------------------------------------------------------------------
+
     //Get Users
     const SELECT_ALL_USERS_QUERY = 'SELECT * FROM users';
 
@@ -96,7 +99,7 @@ con.connect(function (err) {
             }
             else {
                 return res.json({
-                    data: results
+                    users: results
                 })
             }
         });
@@ -134,6 +137,269 @@ con.connect(function (err) {
         });
     });
 
+//--------------------------------------------------------------------------------------------------------------------
+
+// COMPETITIONS METHODS -------------------------------------------------------------------------------------------------------------------------------------
+
+    //Get Competitions
+    const SELECT_ALL_COMPETITIONS_QUERY = 'SELECT * FROM competitions';
+
+    app.get('/api/competitions/View', (req, res) => {
+        con.query(SELECT_ALL_COMPETITIONS_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.json({
+                    competitions: results
+                })
+            }
+        });
+    });
+
+    //Add Competition
+
+    app.post('/api/competitions/Add', (req, res) => {
+        const { name, totalParticipants, numberHelps, discountPerHelp, status } = req.body;
+        console.log(name, totalParticipants, numberHelps, discountPerHelp, status);
+        const INSERT_COMPETITION_QUERY = `INSERT INTO competitions (name, totalParticipants, numberHelps, discountPerHelp, status) VALUES('${name}', ${totalParticipants}, ${numberHelps}, ${discountPerHelp}, '${status}' )`;
+        con.query(INSERT_COMPETITION_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.send('Sucessfully added the competition')
+            }
+        });
+    });
+
+    //Delete Competition
+
+    app.post('/api/competitions/Delete', (req, res) =>{
+        const id = req.body.id;
+        console.log(req.body);
+        const DELETE_COMPETITION_QUERY = `DELETE FROM competitions WHERE id = ${id}` ;
+        con.query(DELETE_COMPETITION_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.send('Sucessfully Deleted the competition')
+            }
+        });
+    });
+
+//--------------------------------------------------------------------------------------------------------------------
+
+// CHALLENGES METHODS -------------------------------------------------------------------------------------------------------------------------------------
+
+    //Get Challenges
+    const SELECT_ALL_CHALLENGES_QUERY = 'SELECT * FROM challenges';
+
+    app.get('/api/challenges/View', (req, res) => {
+        con.query(SELECT_ALL_CHALLENGES_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.json({
+                    challenges: results
+                })
+            }
+        });
+    });
+
+    //Add Challenge
+
+    app.post('/api/challenges/Add', (req, res) => {
+        const { name, description, link, solution } = req.body;
+        console.log(name, description, link, solution);
+        const INSERT_CHALLENGE_QUERY = `INSERT INTO challenges (name, description, link, solution) VALUES('${name}', '${description}', '${link}', '${solution}' )`;
+        con.query(INSERT_CHALLENGE_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.send('Sucessfully added the challenge')
+            }
+        });
+    });
+
+    //Delete Challenge
+
+    app.post('/api/challenges/Delete', (req, res) =>{
+        const id = req.body.id;
+        console.log(req.body);
+        const DELETE_CHALLENGE_QUERY = `DELETE FROM challenges WHERE id = ${id}` ;
+        con.query(DELETE_CHALLENGE_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.send('Sucessfully Deleted the challenge')
+            }
+        });
+    });
+
+//--------------------------------------------------------------------------------------------------------------------
+
+// CHALLENGESPERCOMPETITION METHODS -------------------------------------------------------------------------------------------------------------------------------------
+
+    //Get challengesPerCompetition
+    const SELECT_ALL_CHALLENGESPERCOMPETITION_QUERY = 'SELECT * FROM challengesPerCompetition';
+
+    app.get('/api/challengesPerCompetition/View', (req, res) => {
+        con.query(SELECT_ALL_CHALLENGESPERCOMPETITION_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.json({
+                    challengesPerCompetition: results
+                })
+            }
+        });
+    });
+
+    //Add challengesPerCompetition
+
+    app.post('/api/challengesPerCompetition/Add', (req, res) => {
+        const { competitionID, challengeID, maxScore} = req.body;
+        console.log(competitionID, challengeID, maxScore);
+        const INSERT_CHALLENGEPERCOMPETITION_QUERY = `INSERT INTO challengesPerCompetition (competitionID, challengeID, maxScore) VALUES(${competitionID}, ${challengeID}, ${maxScore} )`;
+        con.query(INSERT_CHALLENGEPERCOMPETITION_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.send('Sucessfully added the challenge in the  Competition')
+            }
+        });
+    });
+
+    //Delete challengesPerCompetition
+
+    app.post('/api/challengesPerCompetition/Delete', (req, res) =>{
+        const id = req.body.id;
+        console.log(req.body);
+        const DELETE_CHALLENGEPERCOMPETITION_QUERY = `DELETE FROM challengesPerCompetition WHERE id = ${id}` ;
+        con.query(DELETE_CHALLENGEPERCOMPETITION_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.send('Sucessfully Deleted the challenge in the competition')
+            }
+        });
+    });
+
+//--------------------------------------------------------------------------------------------------------------------
+
+// REGISTRATIONS METHODS -------------------------------------------------------------------------------------------------------------------------------------
+
+    //Get REGISTRATIONS
+    const SELECT_ALL_REGISTRATIONS_QUERY = `SELECT id, userID, competitionID, DATE_FORMAT(registrationDate, '%d-%m-%y') FROM registrations`;
+
+    app.get('/api/registrations/View', (req, res) => {
+        con.query(SELECT_ALL_REGISTRATIONS_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.json({
+                    registrations: results
+                })
+            }
+        });
+    });
+
+    //Add REGISTRATIONS
+
+    app.post('/api/registrations/Add', (req, res) => {
+        const userID = req.body.userID;
+        const competitionID = req.body.competitionID;
+        const registrationDate = req.body.registrationDate;
+        console.log(userID, competitionID, registrationDate);
+        const INSERT_REGISTRATION_QUERY = `INSERT INTO registrations (userID, competitionID, registrationDate) VALUES(${userID}, ${competitionID}, STR_TO_DATE('${registrationDate}', '%d-%m-%Y') )`;
+        con.query(INSERT_REGISTRATION_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.send('Sucessfully added the registration')
+            }
+        });
+    });
+
+    //Delete REGISTRATIONS
+
+    app.post('/api/registrations/Delete', (req, res) =>{
+        const id = req.body.id;
+        console.log(req.body);
+        const DELETE_REGISTRATION_QUERY = `DELETE FROM registrations WHERE id = ${id}` ;
+        con.query(DELETE_REGISTRATION_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.send('Sucessfully Deleted the registration')
+            }
+        });
+    });
+
+//--------------------------------------------------------------------------------------------------------------------
+
+// scorePerChallengePerCompetition METHODS -------------------------------------------------------------------------------------------------------------------------------------
+
+    //Get scorePerChallengePerCompetition
+    const SELECT_ALL_SCOREPERCHALLENGEPERCOMPETITION_QUERY = 'SELECT * FROM scorePerChallengePerCompetition';
+
+    app.get('/api/scorePerChallengePerCompetition/View', (req, res) => {
+        con.query(SELECT_ALL_SCOREPERCHALLENGEPERCOMPETITION_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.json({
+                    scorePerChallengePerCompetition: results
+                })
+            }
+        });
+    });
+
+    //Add scorePerChallengePerCompetition
+
+    app.post('/api/scorePerChallengePerCompetition/Add', (req, res) => {
+        const { registrationID, challengesPerCompetitionID, score} = req.body;
+        console.log(registrationID, challengesPerCompetitionID, score);
+        const INSERT_SCOREPERCHALLENGEPERCOMPETITION_QUERY = `INSERT INTO scorePerChallengePerCompetition (registrationID, challengesPerCompetitionID, score) VALUES(${registrationID}, ${challengesPerCompetitionID}, ${score} )`;
+        con.query(INSERT_SCOREPERCHALLENGEPERCOMPETITION_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.send('Sucessfully added the score the user had in the Challenge of the Competition')
+            }
+        });
+    });
+
+    //Delete challengesPerCompetition
+
+    app.post('/api/scorePerChallengePerCompetition/Delete', (req, res) =>{
+        const id = req.body.id;
+        console.log(req.body);
+        const DELETE_SCOREPERCHALLENGEPERCOMPETITION_QUERY = `DELETE FROM scorePerChallengePerCompetition WHERE id = ${id}` ;
+        con.query(DELETE_SCOREPERCHALLENGEPERCOMPETITION_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.send('Sucessfully Deleted the score of the user in the challenge of the competition')
+            }
+        });
+    });
+
+//--------------------------------------------------------------------------------------------------------------------
 
 
 
