@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import './Navbar.css';
 var floatRight = { float: 'right' };
 
-class Navbar extends Component {
+class NavBar extends Component {
 
     render() {
         return (
             <header>
                 <ul id="headerButtons">
-                    <li className="navButton"><Link to="/">HomePage</Link></li>
+                    <li className="navButton"><Link to="/home">HomePage</Link></li>
                     <li className="navButton" style={floatRight}><Link to="/about">About</Link></li>
                     <li className="navButton" style={floatRight}><Link to="/signup">Signup</Link></li>
                     <li className="navButton" style={floatRight}><Link to="/login">Login</Link></li>
@@ -18,4 +18,4 @@ class Navbar extends Component {
         )
     }
 } 
-export default Navbar;
+export default NavBar;

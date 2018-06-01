@@ -1,0 +1,23 @@
+input[type=text], input[type=password], input[type=date] {
+    padding: 5px 20px;
+    margin: 8px 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+label{
+    display: inline-block;
+  width: 95px;
+  text-align: right;
+}
+button:hover {
+    opacity: 0.8;
+}
+
+.acceptbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 15px;
+    border: 1px solid #000;
+    cursor: pointer;
+}   
