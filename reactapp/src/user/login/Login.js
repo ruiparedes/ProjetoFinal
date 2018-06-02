@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import './Login.css';
 import { URL } from '../../shared/Constants';
 import Notifications, {notify} from 'react-notify-toast';
+import { Redirect } from 'react-router-dom';
 
 class Login extends React.Component {
 
@@ -12,9 +13,11 @@ class Login extends React.Component {
             username: '',
             password: ''
         }
+
         this.login = this.login.bind(this);
         this.onChange = this.onChange.bind(this);
     }
+
 
     login() {
         if (this.state.username && this.state.password) {
@@ -29,8 +32,24 @@ class Login extends React.Component {
                     'Content-Type': 'application/json'
                 })
             }).then((object) => {
+                console.log(object);
+                console.log(object.status);
+                console.log(object.body.headers);
                 if (object.status === 200) {
-                    notify.show('LOGIN DONE!!');
+                    fetch(URL + ':8080/api/users/View').then(res => res.json()).
+						then(d => {
+                            console.log(d);
+							d.users.filter((users) => {
+								if (users.username === data.username) {
+                                    window.location.href = URL + ":3000/home";
+                                    console.log('Filter ' + users.username + ' ' + users.id + ' ' + users.password + ' ' + users.email + ' ' +users.address);
+									const userData = { id: users.id, username: users.username, email: users.email, address: users.address };
+									localStorage.setItem('userData', JSON.stringify(userData));
+									return;
+								}
+							})
+                        })
+                        notify.show('LOGIN DONE!!');
                 }
                 else{
                     notify.show('Username or Password incorrect!!');
