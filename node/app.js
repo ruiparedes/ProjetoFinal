@@ -113,13 +113,51 @@ con.connect(function (err) {
         const INSERT_USER_QUERY = `INSERT INTO users (username, password, name, email, address) VALUES('${username}', '${password}', '${name}', '${email}', '${address}' )`;
         con.query(INSERT_USER_QUERY, (err, results) => {
             if (err) {
-                return res.send(err)
+                console.log("Error Ocurred", err);
+                res.send({
+                    "code":400,
+                    "failed": "error ocurred"
+                })
             }
             else {
-                return res.send('Sucessfully added the user')
+                console.log("User added:", results);
+                res.send({
+                    "code":200,
+                    "success": "user registered sucessfully"
+                });
             }
         });
     });
+
+    //Login
+    app.post('/api/users/Login', (req, res) =>{
+        const { username, password} = req.body;
+        console.log( username, password);
+        const CHECK_USER_EMAIL_QUERY = `SELECT * FROM users WHERE username = '${username}'`;
+        con.query(CHECK_USER_EMAIL_QUERY, (err, results) =>{
+            if(err){
+                console.log("Error Ocurred", err);
+                res.send({
+                    "code":400,
+                    "failed": "error ocurred"
+                }) 
+            }
+            else{
+                console.log('The Solution is:', results);
+                if(results.length >0){
+                    console.log('length >0');
+                    if(results[0].password == password){
+                        console.log('The Password Matches');
+                        res.send({
+                            "code":200,
+                            "success":"login sucessfull"
+                        });
+                    }
+                }
+            }
+        });
+    });
+
 
     //Delete User
 
@@ -136,6 +174,9 @@ con.connect(function (err) {
             }
         });
     });
+
+
+    
 
 //--------------------------------------------------------------------------------------------------------------------
 
