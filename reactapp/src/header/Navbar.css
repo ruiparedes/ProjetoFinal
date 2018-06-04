@@ -26,3 +26,14 @@ li a:hover {
     text-decoration:none;
     color: #fff;
 }
+.navUsername{
+    color: #fff;
+    display: block;
+    text-align: center;
+    padding: 13px 16px;
+    text-decoration: none;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 12pt;
+    text-transform: uppercase;
+
+}

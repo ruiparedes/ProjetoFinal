@@ -7,6 +7,7 @@ import Home from "./home/Home";
 import Login from "./user/login/Login";
 import Signup from "./user/signup/Signup";
 import About from "./about/About";
+import Competitions from "./management/competitions/Competitions";
 
 
 class App extends React.Component {
@@ -20,6 +21,7 @@ class App extends React.Component {
                 <Route path="/signup" component={Signup} />
                 <Route path="/home" component={Home} />
                 <Route path="/login" component={Login} />
+                <Route path="/competitions" component={Competitions} />
               </div>
           </div>
         </Router>
