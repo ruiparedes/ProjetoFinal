@@ -29,6 +29,7 @@ class Competitions extends React.Component {
     componentDidMount(){
         window.competitionsListener = setInterval(() => this.fetchCompetitions(), 3000);
         this.fetchCompetitions();
+        console.log('Url ' + this.props.location.pathname);
     }
 
     componentWillUnmount() {
