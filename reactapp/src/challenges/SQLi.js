@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { URL } from '../shared/Constants';
 
-class CSRF extends React.Component {
+class SQLi extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            CSRFAttack: ''
+            SQLiAttack: ''
         }
     
         this.sendAttack = this.sendAttack.bind(this);
@@ -30,8 +30,8 @@ sendAttack(){
         return (
             <div>
                 <div className="block">
-                        <label>Attack: </label>
-                        <input type="text" placeholder="Enter the Attack" className="CSRFAttack" onChange={this.onChange} required></input>
+                        <label>Attack SQLi: </label>
+                        <input type="text" placeholder="Enter the Attack" className="SQLiAttack" onChange={this.onChange} required></input>
                     </div>
                 <div className="btncontainer" >
                     <button type="submit" value="Attack" className="acceptbtn" onClick={this.sendAttack}>Attack</button>
@@ -41,4 +41,4 @@ sendAttack(){
     }
 }
 
-export default CSRF;
+export default SQLi;

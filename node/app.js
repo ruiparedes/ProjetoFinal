@@ -32,7 +32,6 @@ app.use((req, res, next) => {
 
 
 //Database Connection
-//Connect to MongoDB
 
 
 //Connect to Mysql database
