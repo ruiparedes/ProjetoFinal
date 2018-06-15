@@ -15,10 +15,11 @@ class App extends React.Component {
   render() {
     return (
       <Router>
-        <Switch>
+        
           <div>
           <NavBar/>
               <div className="routes-container">
+              <Switch>
                 <Route exact path="/about" component={About} />
                 <Route exact path="/signup" component={Signup} />
                 <Route exact path="/home" component={Home} />
@@ -26,9 +27,10 @@ class App extends React.Component {
                 <Route exact path="/competitions" component={Competitions} />
                 <Route exact path="/challengesList" component={ChallengesList} />
                 <Route exact path="/attack/:name" component={AttackPage} />
+                </Switch>
               </div>
           </div>
-        </Switch>
+
         </Router>
     );
   }

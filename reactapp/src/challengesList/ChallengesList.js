@@ -42,8 +42,7 @@ class ChallengesList extends React.Component {
             this.setState({redirect: false});
             return <Redirect
             to={{
-              pathname: "/attack/" + this.state.link,
-              state: { referrer: this.state.link }
+              pathname: "/attack/" + this.state.link
             }}
           />  
         }

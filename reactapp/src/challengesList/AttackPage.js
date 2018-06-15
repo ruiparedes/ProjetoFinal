@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import CSRF from "../challenges/CSRF";
-import SQLi from "../challenges/SQLi";
+import importedComponent from 'react-imported-component';
 
 
 //import Attack from "../challenges/CSRF";
@@ -12,8 +11,10 @@ class AttackPage extends React.Component {
     }
 
     render() {
-        var Attack = this.props.location.state.referrer;
-        return <Attack />;
+        const type = this.props.match.params.name;
+        const myImportFunction = () => import('../challenges/' + type);
+        const Component = importedComponent(myImportFunction);
+        return <Component />;
     }
 }
 
