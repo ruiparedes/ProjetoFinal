@@ -218,7 +218,7 @@ con.connect(function (err) {
     if (err) throw err;
     console.log("Connected to Mysql DB!");
         
-        var UsersTb = "CREATE TABLE if not exists users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(20) NOT NULL UNIQUE, password VARCHAR(20) NOT NULL, name VARCHAR(50) NOT NULL, email VARCHAR(50) NOT NULL UNIQUE, role VARCHAR(15) NOT NULL, creationDate DATE)";
+        var UsersTb = "CREATE TABLE if not exists users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(50) NOT NULL UNIQUE, password VARCHAR(20) NOT NULL, name VARCHAR(50) NOT NULL, email VARCHAR(50) NOT NULL UNIQUE, role VARCHAR(15) NOT NULL, creationDate DATE)";
         con.query(UsersTb, function (err, result) {
             if (err) throw err;
             console.log("Table Users Created");
@@ -226,7 +226,7 @@ con.connect(function (err) {
 
        
     
-        var CompetitionsTb = "CREATE TABLE if not exists competitions (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(20) NOT NULL UNIQUE, maxParticipants INT(2) NOT NULL, status VARCHAR(15) NOT NULL, maxScore int(3), startDate DATE, endDate DATE, totalParticipants int(2))";
+        var CompetitionsTb = "CREATE TABLE if not exists competitions (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL UNIQUE, maxParticipants INT(2) NOT NULL, status VARCHAR(15) NOT NULL, maxScore int(3), startDate DATE, endDate DATE, totalParticipants int(2))";
         con.query(CompetitionsTb, function (err, result) {
             if (err) throw err;
             console.log("Table Competitions Created");
@@ -238,19 +238,19 @@ con.connect(function (err) {
             console.log("Table Registrations Created");
         });
 
-        var ClassificationTb = "CREATE TABLE if not exists classification (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(20) NOT NULL UNIQUE )";
+        var ClassificationTb = "CREATE TABLE if not exists classifications (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL UNIQUE )";
         con.query(ClassificationTb, function (err, result) {
             if (err) throw err;
             console.log("Table Classification Created");
         });
 
-        var SubClassificationTb = "CREATE TABLE if not exists subClassification (id INT AUTO_INCREMENT PRIMARY KEY, classificationID INT NOT NULL, FOREIGN KEY (classificationID) REFERENCES classification(id) , name VARCHAR(20) NOT NULL UNIQUE )";
+        var SubClassificationTb = "CREATE TABLE if not exists subClassifications (id INT AUTO_INCREMENT PRIMARY KEY, classificationID INT NOT NULL, FOREIGN KEY (classificationID) REFERENCES classifications(id) , name VARCHAR(50) NOT NULL UNIQUE )";
         con.query(SubClassificationTb, function (err, result) {
             if (err) throw err;
             console.log("Table SubClassification Created");
         });
     
-        var ChallengesTb = "CREATE TABLE if not exists challenges (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(20) NOT NULL UNIQUE, description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (classificationID) REFERENCES classification(id) )";
+        var ChallengesTb = "CREATE TABLE if not exists challenges (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL UNIQUE, description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (classificationID) REFERENCES classifications(id) )";
         con.query(ChallengesTb, function (err, result) {
             if (err) throw err;
             console.log("Table Challenges Created");
@@ -268,7 +268,7 @@ con.connect(function (err) {
             console.log("Table scorePerChallengePerCompetition Created");
         });
 
-        var QuestionsTb = "CREATE TABLE if not exists questions (id INT AUTO_INCREMENT PRIMARY KEY, classificationID INT NOT NULL, description VARCHAR(200) NOT NULL, answer1 VARCHAR(50), explanation1 VARCHAR(200), answer2 VARCHAR(50), explanation2 VARCHAR(200), answer3 VARCHAR(50), explanation3 VARCHAR(200), answer4 VARCHAR(50), explanation4 VARCHAR(200), correct INT(1) NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (classificationID) REFERENCES classification(id))";
+        var QuestionsTb = "CREATE TABLE if not exists questions (id INT AUTO_INCREMENT PRIMARY KEY, classificationID INT NOT NULL, description VARCHAR(200) NOT NULL, answer1 VARCHAR(50), explanation1 VARCHAR(200), answer2 VARCHAR(50), explanation2 VARCHAR(200), answer3 VARCHAR(50), explanation3 VARCHAR(200), answer4 VARCHAR(50), explanation4 VARCHAR(200), correct INT(1) NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (classificationID) REFERENCES classifications(id))";
         con.query(QuestionsTb, function (err, result) {
             if (err) throw err;
             console.log("Table Questions Created");
@@ -286,16 +286,16 @@ con.connect(function (err) {
             console.log("Table QuizzQuestions Created");
         });
 
-        var QuestionSuggestionTb = "CREATE TABLE if not exists questionSuggestion (id INT AUTO_INCREMENT PRIMARY KEY, description VARCHAR(200) NOT NULL, answer1 VARCHAR(50), explanation1 VARCHAR(200), answer2 VARCHAR(50), explanation2 VARCHAR(200), answer3 VARCHAR(50), explanation3 VARCHAR(200), answer4 VARCHAR(50), explanation4 VARCHAR(200), correct INT(1) NOT NULL, difficulty INT(1) NOT NULL)";
-        con.query(QuestionSuggestionTb, function (err, result) {
+        var QuestionSuggestionsTb = "CREATE TABLE if not exists questionSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, description VARCHAR(200) NOT NULL, answer1 VARCHAR(50), explanation1 VARCHAR(200), answer2 VARCHAR(50), explanation2 VARCHAR(200), answer3 VARCHAR(50), explanation3 VARCHAR(200), answer4 VARCHAR(50), explanation4 VARCHAR(200), correct INT(1) NOT NULL, difficulty INT(1) NOT NULL)";
+        con.query(QuestionSuggestionsTb, function (err, result) {
             if (err) throw err;
-            console.log("Table QuestionSuggestion Created");
+            console.log("Table QuestionSuggestions Created");
         });
 
-        var ChallengeSuggestionTb = "CREATE TABLE if not exists challengeSuggestion (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL , name VARCHAR(30), description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, solution VARCHAR(100) NOT NULL, difficulty INT(1) NOT NULL )";
-        con.query(ChallengeSuggestionTb, function (err, result) {
+        var ChallengeSuggestionsTb = "CREATE TABLE if not exists challengeSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL , name VARCHAR(30), description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, solution VARCHAR(100) NOT NULL, difficulty INT(1) NOT NULL )";
+        con.query(ChallengeSuggestionsTb, function (err, result) {
             if (err) throw err;
-            console.log("Table ChallengeSuggestion Created");
+            console.log("Table ChallengeSuggestions Created");
         });
     
     
@@ -519,9 +519,9 @@ con.connect(function (err) {
         //Add challengesPerCompetition
     
         app.post('/api/challengesPerCompetition/Add', (req, res) => {
-            const { competitionID, challengeID, challengeScore, challengeOrder} = req.body;
-            console.log(competitionID, challengeID, challengeScore, challengeOrder);
-            const INSERT_CHALLENGEPERCOMPETITION_QUERY = `INSERT INTO challengesPerCompetition (competitionID, challengeID, challengeScore, challengeOrder) VALUES(${competitionID}, ${challengeID}, ${challengeScore}, ${challengeOrder} )`;
+            const { competitionID, challengeID, challengePoints, challengeOrder} = req.body;
+            console.log(competitionID, challengeID, challengePoints, challengeOrder);
+            const INSERT_CHALLENGEPERCOMPETITION_QUERY = `INSERT INTO challengesPerCompetition (competitionID, challengeID, challengePoints, challengeOrder) VALUES(${competitionID}, ${challengeID}, ${challengePoints}, ${challengeOrder} )`;
             con.query(INSERT_CHALLENGEPERCOMPETITION_QUERY, (err, results) => {
                 if (err) {
                     return res.send(err)
@@ -656,5 +656,373 @@ con.connect(function (err) {
         });
     
     //--------------------------------------------------------------------------------------------------------------------
+
+// classifications METHODS -------------------------------------------------------------------------------------------------------------------------------------
+    
+        //Get classifications
+        const SELECT_ALL_CLASSIFICATIONS_QUERY = 'SELECT * FROM classifications';
+    
+        app.get('/api/classifications/View', (req, res) => {
+            con.query(SELECT_ALL_CLASSIFICATIONS_QUERY, (err, results) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.json({
+                        classifications: results
+                    })
+                }
+            });
+        });
+    
+        //Add classifications
+    
+        app.post('/api/classifications/Add', (req, res) => {
+            const { name} = req.body;
+            console.log(name);
+            const INSERT_CLASSIFICATION_QUERY = `INSERT INTO classifications (name) VALUES('${name}')`;
+            con.query(INSERT_CLASSIFICATION_QUERY, (err, results) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.send('Sucessfully added a Classification')
+                }
+            });
+        });
+    
+        //Delete classifications
+    
+        app.post('/api/classifications/Delete', (req, res) =>{
+            const id = req.body.id;
+            console.log(req.body);
+            const DELETE_SCOREPERCHALLENGEPERCOMPETITION_QUERY = `DELETE FROM classifications WHERE id = ${id}` ;
+            con.query(DELETE_SCOREPERCHALLENGEPERCOMPETITION_QUERY, (err, results) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.send('Sucessfully Deleted the classification')
+                }
+            });
+        });
+    
+    //--------------------------------------------------------------------------------------------------------------------
+
+    // subClassifications METHODS -------------------------------------------------------------------------------------------------------------------------------------
+    
+        //Get subClassifications
+        const SELECT_ALL_SUBCLASSIFICATIONS_QUERY = 'SELECT * FROM subClassifications';
+    
+        app.get('/api/subClassifications/View', (req, res) => {
+            con.query(SELECT_ALL_SUBCLASSIFICATIONS_QUERY, (err, results) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.json({
+                        subClassifications: results
+                    })
+                }
+            });
+        });
+    
+        //Add subClassifications
+    
+        app.post('/api/subClassifications/Add', (req, res) => {
+            const { classificationID, name} = req.body;
+            console.log(classificationID, name);
+            const INSERT_SUBCLASSIFICATION_QUERY = `INSERT INTO subClassifications (classificationID, name) VALUES(${classificationID}, '${name}')`;
+            con.query(INSERT_SUBCLASSIFICATION_QUERY, (err, results) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.send('Sucessfully added a subClassification')
+                }
+            });
+        });
+    
+        //Delete subClassifications
+    
+        app.post('/api/subClassifications/Delete', (req, res) =>{
+            const id = req.body.id;
+            console.log(req.body);
+            const DELETE_SUBCLASSIFICATION_QUERY = `DELETE FROM subClassifications WHERE id = ${id}` ;
+            con.query(DELETE_SUBCLASSIFICATION_QUERY, (err, results) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.send('Sucessfully Deleted the subClassification')
+                }
+            });
+        });
+    
+    //--------------------------------------------------------------------------------------------------------------------
+
+
+     // questions METHODS -------------------------------------------------------------------------------------------------------------------------------------
+    
+        //Get questions
+        const SELECT_ALL_QUESTIONS_QUERY = 'SELECT * FROM questions';
+    
+        app.get('/api/questions/View', (req, res) => {
+            con.query(SELECT_ALL_QUESTIONS_QUERY, (err, results) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.json({
+                        questions: results
+                    })
+                }
+            });
+        });
+    
+        //Add question
+    
+        app.post('/api/questions/Add', (req, res) => {
+            const { classificationID, description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, difficulty} = req.body;
+            console.log(classificationID, description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, difficulty);
+            const INSERT_QUESTIONS_QUERY = `INSERT INTO questions (classificationID, description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, difficulty) VALUES(${classificationID}, '${description}', '${answer1}', '${explanation1}', '${answer2}', '${explanation2}', '${answer3}', '${explanation3}', '${answer4}', '${explanation4}', ${corret}, ${difficulty})`;
+            con.query(INSERT_QUESTIONS_QUERY, (err, res) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.send('Sucessfully added a question')
+                }
+            });
+        });
+    
+        //Delete question
+    
+        app.post('/api/questions/Delete', (req, res) =>{
+            const id = req.body.id;
+            console.log(req.body);
+            const DELETE_QUESTIONS_QUERY = `DELETE FROM questions WHERE id = ${id}` ;
+            con.query(DELETE_QUESTIONS_QUERY, (err, res) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.send('Sucessfully Deleted the question')
+                }
+            });
+        });
+    
+    //--------------------------------------------------------------------------------------------------------------------
+
+     // QuizzQuestions METHODS -------------------------------------------------------------------------------------------------------------------------------------
+    
+        //Get quizzQuestions
+        const SELECT_ALL_QUIZZQUESTIONS_QUERY = 'SELECT * FROM quizzQuestions';
+    
+        app.get('/api/quizzQuestions/View', (req, res) => {
+            con.query(SELECT_ALL_QUIZZQUESTIONS_QUERY, (err, results) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.json({
+                        quizzQuestions: results
+                    })
+                }
+            });
+        });
+    
+        //Add quizzQuestions
+    
+        app.post('/api/quizzQuestions/Add', (req, res) => {
+            const { questionID, quizzID, questionPoints, questionOrder} = req.body;
+            console.log(questionID, quizzID, questionPoints, questionOrder);
+            const INSERT_QUIZZQUESTIONS_QUERY = `INSERT INTO quizzQuestions (questionID, quizzID, questionPoints, questionOrder) VALUES(${questionID}, ${quizzID}, ${questionPoints}, ${questionOrder})`;
+            con.query(INSERT_QUIZZQUESTIONS_QUERY, (err, res) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.send('Sucessfully added a question to the quizz')
+                }
+            });
+        });
+    
+        //Delete quizzQuestion
+    
+        app.post('/api/quizzQuestions/Delete', (req, res) =>{
+            const id = req.body.id;
+            console.log(req.body);
+            const DELETE_QUIZZQUESTIONS_QUERY = `DELETE FROM quizzQuestions WHERE id = ${id}` ;
+            con.query(DELETE_QUIZZQUESTIONS_QUERY, (err, res) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.send('Sucessfully Deleted the question in the Quizz')
+                }
+            });
+        });
+    
+    //--------------------------------------------------------------------------------------------------------------------
+
+     // Quizzes METHODS -------------------------------------------------------------------------------------------------------------------------------------
+    
+        //Get Quizzes
+        const SELECT_ALL_QUIZZES_QUERY = 'SELECT * FROM quizzes';
+    
+        app.get('/api/quizzes/View', (req, res) => {
+            con.query(SELECT_ALL_QUIZZES_QUERY, (err, results) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.json({
+                        quizzes: results
+                    })
+                }
+            });
+        });
+    
+        //Add quizzes
+    
+        app.post('/api/quizzes/Add', (req, res) => {
+            const { name, year, numberQuestions} = req.body;
+            console.log(name, year, numberQuestions);
+            const INSERT_QUIZZES_QUERY = `INSERT INTO quizzQuestions (name, year, numberQuestions) VALUES('${name}', ${year}, ${numberQuestions})`;
+            con.query(INSERT_QUIZZES_QUERY, (err, res) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.send('Sucessfully added a quizz')
+                }
+            });
+        });
+    
+        //Delete quizzes
+    
+        app.post('/api/quizzes/Delete', (req, res) =>{
+            const id = req.body.id;
+            console.log(req.body);
+            const DELETE_QUIZZQUESTIONS_QUERY = `DELETE FROM quizzQuestions WHERE id = ${id}` ;
+            con.query(DELETE_QUIZZQUESTIONS_QUERY, (err, res) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.send('Sucessfully Deleted the question in the Quizz')
+                }
+            });
+        });
+    
+    //--------------------------------------------------------------------------------------------------------------------
+
+    // questionSuggestions METHODS -------------------------------------------------------------------------------------------------------------------------------------
+    
+        //Get questionSuggestions
+        const SELECT_ALL_QUESTIONSUGGESTIONS_QUERY = 'SELECT * FROM questionSuggestions';
+    
+        app.get('/api/questionSuggestions/View', (req, res) => {
+            con.query(SELECT_ALL_QUESTIONSUGGESTIONS_QUERY, (err, results) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.json({
+                        questionSuggestions: results
+                    })
+                }
+            });
+        });
+    
+        //Add questionSuggestions
+    
+        app.post('/api/questionSuggestions/Add', (req, res) => {
+            const { description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, userID} = req.body;
+            console.log(description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, userID);
+            const INSERT_QUESTIONSUGGESTIONS_QUERY = `INSERT INTO questionSuggestions (description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, userID) VALUES( '${description}', '${answer1}', '${explanation1}', '${answer2}', '${explanation2}', '${answer3}', '${explanation3}', '${answer4}', '${explanation4}', ${corret}, ${userID})`;
+            con.query(INSERT_QUESTIONSUGGESTIONS_QUERY, (err, res) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.send('Sucessfully added a question to the Suggestions')
+                }
+            });
+        });
+    
+        //Delete questionSuggestions
+    
+        app.post('/api/questionSuggestions/Delete', (req, res) =>{
+            const id = req.body.id;
+            console.log(req.body);
+            const DELETE_QUESTIONSUGGESTIONS_QUERY = `DELETE FROM questionSuggestions WHERE id = ${id}` ;
+            con.query(DELETE_QUESTIONSUGGESTIONS_QUERY, (err, res) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.send('Sucessfully Deleted a question from the suggestions')
+                }
+            });
+        });
+    
+    //--------------------------------------------------------------------------------------------------------------------
+
+    // challengeSuggestions METHODS -------------------------------------------------------------------------------------------------------------------------------------
+    
+        //Get challengeSuggestions
+        const SELECT_ALL_CHALLENGESUGGESTIONS_QUERY = 'SELECT * FROM challengeSuggestions';
+    
+        app.get('/api/challengeSuggestions/View', (req, res) => {
+            con.query(SELECT_ALL_CHALLENGESUGGESTIONS_QUERY, (err, results) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.json({
+                        challengeSuggestion: results
+                    })
+                }
+            });
+        });
+    
+        //Add challengeSuggestions
+    
+        app.post('/api/challengeSuggestions/Add', (req, res) => {
+            const { userID, name, description, link, solution, difficulty} = req.body;
+            console.log(userID, name, description, link, solution, difficulty);
+            const INSERT_CHALLENGESUGGESTIONS_QUERY = `INSERT INTO challengeSuggestions (userID, name, description, link, solution, difficulty) VALUES(${userID},'${name}', '${description}', '${link}', '${solution}', ${difficulty})`;
+            con.query(INSERT_CHALLENGESUGGESTIONS_QUERY, (err, res) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.send('Sucessfully added a challenge to the suggestions')
+                }
+            });
+        });
+    
+        //Delete challengeSuggestions
+    
+        app.post('/api/challengeSuggestions/Delete', (req, res) =>{
+            const id = req.body.id;
+            console.log(req.body);
+            const DELETE_CHALLENGESUGGESTIONS_QUERY = `DELETE FROM challengeSuggestions WHERE id = ${id}` ;
+            con.query(DELETE_CHALLENGESUGGESTIONS_QUERY, (err, res) => {
+                if (err) {
+                    return res.send(err)
+                }
+                else {
+                    return res.send('Sucessfully Deleted the challenge from the suggestions')
+                }
+            });
+        });
+    
+    //--------------------------------------------------------------------------------------------------------------------
+
+    
 });
+
 
