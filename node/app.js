@@ -250,7 +250,7 @@ con.connect(function (err) {
             console.log("Table SubClassification Created");
         });
     
-        var ChallengesTb = "CREATE TABLE if not exists challenges (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL UNIQUE, description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (classificationID) REFERENCES classifications(id) )";
+        var ChallengesTb = "CREATE TABLE if not exists challenges (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL UNIQUE, description VARCHAR(5000) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (classificationID) REFERENCES classifications(id) )";
         con.query(ChallengesTb, function (err, result) {
             if (err) throw err;
             console.log("Table Challenges Created");
@@ -459,6 +459,26 @@ con.connect(function (err) {
                 else {
                     return res.json({
                         challenges: results
+                    })
+                }
+            });
+        });
+
+        //Get Challenge By ID
+
+    
+        app.get('/api/challengeById/:id', (req, res) => {
+            const id = req.params.id; 
+            const SELECT_CHALLENGEBYID_QUERY = `SELECT * FROM challenges where id = ${id}`;
+            con.query(SELECT_CHALLENGEBYID_QUERY, (err, results) => {
+                if (err) {
+                    console.log("ERRO ERRO");
+                    return res.send(err)
+                }
+                else {
+                    console.log(results);
+                    return res.json({
+                        challenge: results
                     })
                 }
             });

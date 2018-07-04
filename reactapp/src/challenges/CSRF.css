@@ -1,0 +1,37 @@
+#challengeDescription{
+    text-align: justify;
+}
+#challengeBox{
+    box-shadow: 0 0 10px black;
+    background-color: white;
+    padding-top: 35px;
+    padding-bottom: 35px;
+    padding: 30px 15px;
+    margin-bottom: auto;
+    color: inherit;
+    background-color: #eee;
+    width: 800px;
+    margin-top: 100px;
+    margin-left:auto;
+    margin-right: auto;
+    border-radius: 1%;
+    
+}
+
+#attackBox{
+    width: 300px;
+    height: 40px;   
+    font-size: 15px;    
+    box-shadow: 0 0 5px black;
+}
+
+.attackButton{
+    height: 40px;
+    width: 100px;
+    box-shadow: 0 0 5px black;
+    
+}
+#challengeName{
+    text-align: center;
+}
+

@@ -10,12 +10,12 @@ import About from "./about/About";
 import Competitions from "./management/competitions/Competitions";
 import ChallengesList from "./challengesList/ChallengesList";
 import AttackPage from "./challengesList/AttackPage";
+import SubPages from './challengesList/SubPages';
 
 class App extends React.Component {
   render() {
     return (
       <Router>
-        
           <div>
           <NavBar/>
               <div className="routes-container">
@@ -26,11 +26,10 @@ class App extends React.Component {
                 <Route exact path="/login" component={Login} />
                 <Route exact path="/competitions" component={Competitions} />
                 <Route exact path="/challengesList" component={ChallengesList} />
-                <Route exact path="/attack/:name" component={AttackPage} />
+                <Route exact path="/attack/:nameId/" component={AttackPage} />
                 </Switch>
               </div>
           </div>
-
         </Router>
     );
   }

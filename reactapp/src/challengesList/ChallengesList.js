@@ -25,14 +25,14 @@ class ChallengesList extends React.Component {
             then(data => this.setState({ challenges: data.challenges }));
     }
 
-    redirectF(challengeName){
-        console.log(challengeName);
-        var attackName = challengeName.replace(/ +/g,"");
-        console.log(attackName);
-        console.log(this.state.redirect);
-        this.setState({link: challengeName});        
+    redirectF(challengeNameID){
+        //console.log(challengeName);
+        //var attackName = challengeName.replace(/ +/g,"");
+        //console.log(attackName);
+        //console.log(this.state.redirect);
+        this.setState({link: challengeNameID});        
         this.setState({redirect: true});
-        console.log(this.state.redirect);
+        //console.log(this.state.redirect);
 
         //window.location.href = URL + ":3000/attack/"+ attackName;
     }
@@ -51,7 +51,7 @@ class ChallengesList extends React.Component {
             <div>
                 {this.state.challenges.map((challenges, challengesIndex) => (
                     <div className="btncontainer" >
-                        <button type="submit" value={'challenge_'+ challengesIndex} className="acceptbtn" onClick={() => {this.redirectF(challenges.name)}} >{challenges.name}</button>
+                        <button type="submit" value={'challenge_'+ challengesIndex} className="acceptbtn" onClick={() => {this.redirectF(challenges.name+"_"+challenges.id)}} >{challenges.name}</button>
                     </div>
                 ))}
             </div>
