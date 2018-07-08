@@ -70,6 +70,7 @@ conVul.connect(function (err) {
         console.log("Table BankTransfers Created in MySQL Vuln");
     });
 
+
     //MySQL Tables Methods
 
     // USER METHODS -------------------------------------------------------------------------------------------------------------------------------------
@@ -90,6 +91,23 @@ conVul.connect(function (err) {
             }
         });
     });
+
+    app.post('/api-vulnerable/users/Login', (req, res) =>{
+        const {username, password} = req.body;
+        console.log(username, password);
+        const LOGIN_VULN_USERS_QUERY = `SELECT username, password from users where username = '${username}' and password = '${password}'`;
+        console.log(LOGIN_VULN_USERS_QUERY);
+        conVul.query(LOGIN_VULN_USERS_QUERY, (err, results) => {
+            if (results.length!=0 && username=='admin') {
+                console.log("Login Realizado: "+ results.length);
+            }
+            else {
+                console.log("Falha no Login: "+ results.length);
+            }
+        })
+    });
+
+
 
     //Add User
 

@@ -29,6 +29,10 @@
     height: 40px;
     width: 100px;
     box-shadow: 0 0 5px black;
+    font-size: 14px;
+    -webkit-transition: all 0.3 ease;
+    transition: all 0.3 ease;
+    cursor: pointer;
     
 }
 #challengeName{

@@ -1,40 +1,65 @@
 import React, { Component } from 'react';
 import { URL } from '../shared/Constants';
-
+import './SQLi.css';
 class SQLi extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            SQLiAttack: ''
+            username:'',
+            password:'',
+            challenge: []
         }
-    
+
         this.sendAttack = this.sendAttack.bind(this);
         this.onChange = this.onChange.bind(this);
     }
 
-    
+    componentDidMount() {
+        let id = this.props.id;
+        const getChallenge = URL + ':8080/api/challengeById/' + id;
+        fetch(getChallenge).then(res => res.json())
+            .then(data => {
+                this.setState({ challenge: data.challenge[0] })
+            })
+    }
+
+
     onChange(e) {
         this.setState({ [e.target.className]: e.target.value });
-        console.log({[e.target.className]: e.target.value});
+        console.log({ [e.target.className]: e.target.value });
     }
-    
-sendAttack(){
 
-    //Codigo para enviar os dados para um componente diferente.
+    sendAttack() {
+        const data = {
+            username: this.state.username,
+            password: this.state.password
+        }
+        fetch(URL + ':8080/api-vulnerable/users/Login', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            })
+        });
 
-}
+    }
 
 
     render() {
         return (
             <div>
-                <div className="block">
-                        <label>Attack SQLi: </label>
-                        <input type="text" placeholder="Enter the Attack" className="SQLiAttack" onChange={this.onChange} required></input>
+                <div id="challengeBox">
+                <h2 id="challengeName">{this.state.challenge.name}</h2>
+                <h4>{this.state.challenge.description}</h4>
+                <div id="attackContainer">
+                <div id = "attackLogin"><h3>Login</h3></div>
+                    <div id="insertField"><input type="text" placeholder="username" className="username" id="attackField" onChange={this.onChange} required></input></    div>
+                    <div id="insertField"><input type="password" placeholder="password" className="password" id="attackField" onChange={this.onChange} required></input></div>
+                    <div id="attackButtonContainer" >
+                        <button type="submit" value="Login" id= "attackButton" onClick={this.sendAttack}>Login</button>
                     </div>
-                <div className="btncontainer" >
-                    <button type="submit" value="Attack" className="acceptbtn" onClick={this.sendAttack}>Attack</button>
+                    </div>
                 </div>
             </div>
         );
