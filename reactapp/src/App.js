@@ -10,6 +10,7 @@ import About from "./about/About";
 import Competitions from "./management/competitions/Competitions";
 import ChallengesList from "./challengesList/ChallengesList";
 import AttackPage from "./challengesList/AttackPage";
+import CompetitionsList from "./competitions/CompetitionsList";
 import SubPages from './challengesList/SubPages';
 
 class App extends React.Component {
@@ -27,6 +28,7 @@ class App extends React.Component {
                 <Route exact path="/competitions" component={Competitions} />
                 <Route exact path="/challengesList" component={ChallengesList} />
                 <Route exact path="/attack/:nameId/" component={AttackPage} />
+                <Route exact path="/competitionsList" component={CompetitionsList} />
                 </Switch>
               </div>
           </div>

@@ -1,0 +1,41 @@
+#competitionBox{
+    flex-direction: row;
+    justify-content: space-between;
+    width: 15%;
+    border: 1px black solid;
+    margin: 5px;
+    float: left;
+}
+
+#competitionName{
+text-align: center; 
+}
+
+#competitionParticipants{
+    text-align: center;
+}
+#competitionDates{
+    text-align: center;
+}
+#competitionStatus{
+    text-align: center;
+}
+
+#buttonDiv{
+    text-align: center;
+}
+
+#registerButton{
+    font-family: "Roboto", sans-serif;
+    outline: 0;
+    background: #4CAF50;
+    width: 25%;
+    border: 0;
+    color: #FFFFFF;
+    padding: 5px;
+    font-size: 14px;
+    -webkit-transition: all 0.3 ease;
+    transition: all 0.3 ease;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
