@@ -39,3 +39,18 @@ text-align: center;
     cursor: pointer;
     margin-bottom: 10px;
 }
+
+#enterButton{
+    font-family: "Roboto", sans-serif;
+    outline: 0;
+    background: #4CAF50;
+    width: 25%;
+    border: 0;
+    color: #FFFFFF;
+    padding: 5px;
+    font-size: 14px;
+    -webkit-transition: all 0.3 ease;
+    transition: all 0.3 ease;
+    cursor: pointer;
+    margin-bottom: 10px;
+}

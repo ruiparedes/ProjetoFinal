@@ -250,7 +250,7 @@ con.connect(function (err) {
             console.log("Table Competitions Created");
         });
 
-        var RegistrationsTb = "CREATE TABLE if not exists registrations (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL, competitionID INT NOT NULL, finalScore INT(3) ,FOREIGN KEY (userID) REFERENCES users(id), FOREIGN KEY (competitionID) REFERENCES competitions(id), registrationDate DATE NOT NULL)";
+        var RegistrationsTb = "CREATE TABLE if not exists registrations (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL, competitionID INT NOT NULL, finalScore INT(3), finalTime INT(6) ,FOREIGN KEY (userID) REFERENCES users(id), FOREIGN KEY (competitionID) REFERENCES competitions(id), registrationDate DATE NOT NULL)";
         con.query(RegistrationsTb, function (err, result) {
             if (err) throw err;
             console.log("Table Registrations Created");
@@ -280,13 +280,13 @@ con.connect(function (err) {
             console.log("Table ChallengesPerCompetition Created");
         });
     
-        var scorePerChallengePerCompetitionTb = "CREATE TABLE if not exists scorePerChallengePerCompetition (id INT AUTO_INCREMENT PRIMARY KEY, registrationID INT NOT NULL, challengesPerCompetitionID INT NOT NULL, FOREIGN KEY (registrationID) REFERENCES registrations(id), FOREIGN KEY (challengesPerCompetitionID) REFERENCES challengesPerCompetition(id), score INT(3) NOT NULL)";
+        var scorePerChallengePerCompetitionTb = "CREATE TABLE if not exists scorePerChallengePerCompetition (id INT AUTO_INCREMENT PRIMARY KEY, registrationID INT NOT NULL, challengesPerCompetitionID INT NOT NULL, FOREIGN KEY (registrationID) REFERENCES registrations(id), FOREIGN KEY (challengesPerCompetitionID) REFERENCES challengesPerCompetition(id), score INT(3) NOT NULL, time INT(6))";
         con.query(scorePerChallengePerCompetitionTb, function (err, result) {
             if (err) throw err;
             console.log("Table scorePerChallengePerCompetition Created");
         });
 
-        var QuestionsTb = "CREATE TABLE if not exists questions (id INT AUTO_INCREMENT PRIMARY KEY, classificationID INT NOT NULL, description VARCHAR(200) NOT NULL, answer1 VARCHAR(50), explanation1 VARCHAR(200), answer2 VARCHAR(50), explanation2 VARCHAR(200), answer3 VARCHAR(50), explanation3 VARCHAR(200), answer4 VARCHAR(50), explanation4 VARCHAR(200), correct INT(1) NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (classificationID) REFERENCES classifications(id))";
+        var QuestionsTb = "CREATE TABLE if not exists questions (id INT AUTO_INCREMENT PRIMARY KEY, classificationID INT NOT NULL, description VARCHAR(200) NOT NULL, answer1 VARCHAR(200), explanation1 VARCHAR(400), answer2 VARCHAR(200), explanation2 VARCHAR(400), answer3 VARCHAR(200), explanation3 VARCHAR(400), answer4 VARCHAR(200), explanation4 VARCHAR(400), correct VARCHAR(200) NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (classificationID) REFERENCES classifications(id))";
         con.query(QuestionsTb, function (err, result) {
             if (err) throw err;
             console.log("Table Questions Created");
@@ -298,19 +298,19 @@ con.connect(function (err) {
             console.log("Table Quizzes Created");
         });
         
-        var QuizzQuestionsTb = "CREATE TABLE if not exists quizzQuestions (id INT AUTO_INCREMENT PRIMARY KEY, questionID INT NOT NULL, quizzID INT NOT NULL, questionPoints INT(3) NOT NULL, FOREIGN KEY (quizzID) REFERENCES questions(id), questionOrder INT(3) NOT NULL)";
+        var QuizzQuestionsTb = "CREATE TABLE if not exists quizzQuestions (id INT AUTO_INCREMENT PRIMARY KEY, questionID INT NOT NULL, quizzID INT NOT NULL, questionPoints INT(3) NOT NULL, FOREIGN KEY (questionID) REFERENCES questions(id),FOREIGN KEY (quizzID) REFERENCES quizzes(id) , questionOrder INT(3) NOT NULL)";
         con.query(QuizzQuestionsTb, function (err, result) {
             if (err) throw err;
             console.log("Table QuizzQuestions Created");
         });
 
-        var QuestionSuggestionsTb = "CREATE TABLE if not exists questionSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, description VARCHAR(200) NOT NULL, answer1 VARCHAR(50), explanation1 VARCHAR(200), answer2 VARCHAR(50), explanation2 VARCHAR(200), answer3 VARCHAR(50), explanation3 VARCHAR(200), answer4 VARCHAR(50), explanation4 VARCHAR(200), correct INT(1) NOT NULL, difficulty INT(1) NOT NULL)";
+        var QuestionSuggestionsTb = "CREATE TABLE if not exists questionSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, description VARCHAR(200) NOT NULL, answer1 VARCHAR(200), explanation1 VARCHAR(400), answer2 VARCHAR(200), explanation2 VARCHAR(400), answer3 VARCHAR(200), explanation3 VARCHAR(400), answer4 VARCHAR(200), explanation4 VARCHAR(400), correct VARCHAR(200) NOT NULL, difficulty INT(1) NOT NULL, userID INT NOT NULL, FOREIGN KEY (userID) REFERENCES users(id))";
         con.query(QuestionSuggestionsTb, function (err, result) {
             if (err) throw err;
             console.log("Table QuestionSuggestions Created");
         });
 
-        var ChallengeSuggestionsTb = "CREATE TABLE if not exists challengeSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL , name VARCHAR(30), description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, solution VARCHAR(100) NOT NULL, difficulty INT(1) NOT NULL )";
+        var ChallengeSuggestionsTb = "CREATE TABLE if not exists challengeSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL , name VARCHAR(30), description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, solution VARCHAR(100) NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (userID) REFERENCES users(id))";
         con.query(ChallengeSuggestionsTb, function (err, result) {
             if (err) throw err;
             console.log("Table ChallengeSuggestions Created");
@@ -591,7 +591,7 @@ con.connect(function (err) {
     // REGISTRATIONS METHODS -------------------------------------------------------------------------------------------------------------------------------------
     
         //Get REGISTRATIONS
-        const SELECT_ALL_REGISTRATIONS_QUERY = `SELECT id, userID, competitionID, finalScore, DATE_FORMAT(registrationDate, '%d-%m-%y') FROM registrations`;
+        const SELECT_ALL_REGISTRATIONS_QUERY = `SELECT id, userID, competitionID, finalScore, finalTime, DATE_FORMAT(registrationDate, '%d-%m-%y') FROM registrations`;
     
         app.get('/api/registrations/View', (req, res) => {
             con.query(SELECT_ALL_REGISTRATIONS_QUERY, (err, results) => {
@@ -605,6 +605,25 @@ con.connect(function (err) {
                 }
             });
         });
+
+        //Get User Registrations
+        app.get('/api/userRegistrations/:userID', (req, res) => {
+            const userID = req.params.userID; 
+            console.log(userID);
+            const SELECT_USERREGISTRATIONS_QUERY = `SELECT competitionID FROM registrations where userID = ${userID}`;
+            con.query(SELECT_USERREGISTRATIONS_QUERY, (err, results) => {
+                if (err) {
+                    console.log("ERRO ERRO");
+                    return res.send(err)
+                }
+                else {
+                    console.log(results);
+                    return res.json({
+                        registrations: results
+                    })
+                }
+            });
+        });
     
         //Add REGISTRATIONS
     
@@ -612,9 +631,10 @@ con.connect(function (err) {
             const userID = req.body.userID;
             const competitionID = req.body.competitionID;
             const finalScore = req.body.finalScore;
+            const finalTime = req.body.finalTime
             const registrationDate = req.body.registrationDate;
-            console.log(userID, competitionID, finalScore, registrationDate);
-            const INSERT_REGISTRATION_QUERY = `INSERT INTO registrations (userID, competitionID, finalScore, registrationDate) VALUES(${userID}, ${competitionID}, ${finalScore}, STR_TO_DATE('${registrationDate}', '%d-%m-%Y') )`;
+            console.log(userID, competitionID, finalScore, finalTime, registrationDate);
+            const INSERT_REGISTRATION_QUERY = `INSERT INTO registrations (userID, competitionID, finalScore, finalTime, registrationDate) VALUES(${userID}, ${competitionID}, ${finalScore}, ${finalTime}, STR_TO_DATE('${registrationDate}', '%d-%m-%Y') )`;
             con.query(INSERT_REGISTRATION_QUERY, (err, results) => {
                 if (err) {
                     return res.send(err)
@@ -664,9 +684,9 @@ con.connect(function (err) {
         //Add scorePerChallengePerCompetition
     
         app.post('/api/scorePerChallengePerCompetition/Add', (req, res) => {
-            const { registrationID, challengesPerCompetitionID, score} = req.body;
-            console.log(registrationID, challengesPerCompetitionID, score);
-            const INSERT_SCOREPERCHALLENGEPERCOMPETITION_QUERY = `INSERT INTO scorePerChallengePerCompetition (registrationID, challengesPerCompetitionID, score) VALUES(${registrationID}, ${challengesPerCompetitionID}, ${score} )`;
+            const { registrationID, challengesPerCompetitionID, score, time} = req.body;
+            console.log(registrationID, challengesPerCompetitionID, score, time);
+            const INSERT_SCOREPERCHALLENGEPERCOMPETITION_QUERY = `INSERT INTO scorePerChallengePerCompetition (registrationID, challengesPerCompetitionID, score) VALUES(${registrationID}, ${challengesPerCompetitionID}, ${score}, ${time} )`;
             con.query(INSERT_SCOREPERCHALLENGEPERCOMPETITION_QUERY, (err, results) => {
                 if (err) {
                     return res.send(err)
