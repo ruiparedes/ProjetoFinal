@@ -2,6 +2,19 @@ const express = require('express');
 const cors = require('cors');
 var bodyParser = require('body-parser');
 var dateFormat = require('dateformat');
+var moment = require('moment');
+fileUpload = require('express-fileupload');
+
+var multer  = require('multer');
+var storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, './uploads/')
+    },
+    filename: (req, file, cb) => {
+      cb(null, file.fieldname + '-' + Date.now() + '.zip');
+    }
+});
+var upload = multer({storage: storage}).single('file');
 
 
 const app = express();
@@ -10,7 +23,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.urlencoded());
+
 
 app.get('/', (req, res) => {
     res.send('Welcome to the NodeJS server')
@@ -630,11 +643,11 @@ con.connect(function (err) {
         app.post('/api/registrations/Add', (req, res) => {
             const userID = req.body.userID;
             const competitionID = req.body.competitionID;
-            const finalScore = req.body.finalScore;
-            const finalTime = req.body.finalTime
-            const registrationDate = req.body.registrationDate;
+            const finalScore = 0;
+            const finalTime = 0;
+            const registrationDate = moment().format('DD-MM-YYYY');
             console.log(userID, competitionID, finalScore, finalTime, registrationDate);
-            const INSERT_REGISTRATION_QUERY = `INSERT INTO registrations (userID, competitionID, finalScore, finalTime, registrationDate) VALUES(${userID}, ${competitionID}, ${finalScore}, ${finalTime}, STR_TO_DATE('${registrationDate}', '%d-%m-%Y') )`;
+            const INSERT_REGISTRATION_QUERY = `INSERT INTO registrations (userID, competitionID, finalScore, finalTime, registrationDate) VALUES(${userID}, ${competitionID}, ${finalScore}, ${finalTime}, STR_TO_DATE('${registrationDate}', '%d-%m-%Y'))`;
             con.query(INSERT_REGISTRATION_QUERY, (err, results) => {
                 if (err) {
                     return res.send(err)
@@ -1047,19 +1060,19 @@ con.connect(function (err) {
         });
     
         //Add challengeSuggestions
+
     
         app.post('/api/challengeSuggestions/Add', (req, res) => {
-            const { userID, name, description, link, solution, difficulty} = req.body;
-            console.log(userID, name, description, link, solution, difficulty);
-            const INSERT_CHALLENGESUGGESTIONS_QUERY = `INSERT INTO challengeSuggestions (userID, name, description, link, solution, difficulty) VALUES(${userID},'${name}', '${description}', '${link}', '${solution}', ${difficulty})`;
-            con.query(INSERT_CHALLENGESUGGESTIONS_QUERY, (err, res) => {
-                if (err) {
-                    return res.send(err)
+
+            upload(req,res,(err) =>{
+                if(err){
+                    console.log("Erro no upload do ficheiro")
                 }
-                else {
-                    return res.send('Sucessfully added a challenge to the suggestions')
+                else{
+                    console.log(req.file);
                 }
-            });
+            })
+            
         });
     
         //Delete challengeSuggestions

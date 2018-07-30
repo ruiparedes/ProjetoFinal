@@ -13,14 +13,20 @@ class CompetitionsList extends React.Component {
         }
         this.fetchCompetitions = this.fetchCompetitions.bind(this);
         this.fetchUserRegistrations = this.fetchUserRegistrations.bind(this);
+        this.registerCompetition = this.registerCompetition.bind(this);
     }
 
 
     componentDidMount() {
+        window.competitionsListener = setInterval(() => this.fetchUserRegistrations(), 1000);
         this.fetchCompetitions();
         this.fetchUserRegistrations();
 
     }
+
+    componentWillUnmount() {
+        clearInterval(this.interval);
+      }
 
     fetchCompetitions() {
         fetch(URL + ':8080/api/competitions/View').then(res => res.json()).
@@ -47,6 +53,20 @@ class CompetitionsList extends React.Component {
 
     }
 
+    registerCompetition(competitionID){
+        let userID = localUser.id;
+        fetch(URL + ':8080/api/registrations/Add', {
+            method: 'POST',
+            body: JSON.stringify({
+                userID: userID,
+                competitionID: competitionID
+            }),
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            })
+        });
+    }
+
 
 
     render() {
@@ -60,8 +80,8 @@ class CompetitionsList extends React.Component {
                         <div id="competitionDates"><h4>Competition Date: {competition.startDate} / {competition.endDate}</h4></div>
                         <div id="competitionStatus"><h4>Status: {competition.status}</h4></div>
                         <div id="buttonDiv">
-                            {this.isRegistered(competition) ? <button type="submit" value="EnterInCompetition" className="EnterInCompetitionButton" id="enterButton" >Entrar</button>
-                                : <button type="submit" value="RegisterInCompetition" className="RegisterInCompetitionButton" id="registerButton" >Registar</button>}</div>
+                            {this.isRegistered(competition) ? <button type="submit" value="EnterInCompetition" className="EnterInCompetitionButton" id="enterButton" onClick={() => {this.enterCompetition(competition.id)}}  >Entrar</button>
+                                : <button type="submit" value="RegisterInCompetition" className="RegisterInCompetitionButton" id="registerButton" onClick={() => {this.registerCompetition(competition.id)}} >Registar</button>}</div>
                     </div>
                 ))}
             </div>
