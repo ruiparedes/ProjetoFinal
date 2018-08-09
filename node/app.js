@@ -4,6 +4,8 @@ var bodyParser = require('body-parser');
 var dateFormat = require('dateformat');
 var moment = require('moment');
 fileUpload = require('express-fileupload');
+var fs = require('fs-extra');
+var mv = require('mv');
 
 var multer = require('multer');
 var storage = multer.diskStorage({
@@ -14,6 +16,8 @@ var storage = multer.diskStorage({
         cb(null, file.fieldname + '-' + Date.now() + '.zip');
     }
 });
+
+
 var upload = multer({ storage: storage }).single('file');
 
 
@@ -257,13 +261,13 @@ con.connect(function (err) {
 
 
 
-    var CompetitionsTb = "CREATE TABLE if not exists competitions (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL UNIQUE, maxParticipants INT(2) NOT NULL, status VARCHAR(15) NOT NULL, maxScore int(3), startDate DATE, endDate DATE, totalParticipants int(2))";
+    var CompetitionsTb = "CREATE TABLE if not exists competitions (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL UNIQUE, maxParticipants INT(2) NOT NULL, status VARCHAR(15) NOT NULL, maxScore int(3), startDate DATETIME, endDate DATETIME, totalParticipants int(2))";
     con.query(CompetitionsTb, function (err, result) {
         if (err) throw err;
         console.log("Table Competitions Created");
     });
 
-    var RegistrationsTb = "CREATE TABLE if not exists registrations (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL, competitionID INT NOT NULL, finalScore INT(3), finalTime INT(6) ,FOREIGN KEY (userID) REFERENCES users(id), FOREIGN KEY (competitionID) REFERENCES competitions(id), registrationDate DATE NOT NULL)";
+    var RegistrationsTb = "CREATE TABLE if not exists registrations (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL, competitionID INT NOT NULL, finalScore INT(3), finalTime INT(6) ,FOREIGN KEY (userID) REFERENCES users(id), FOREIGN KEY (competitionID) REFERENCES competitions(id), registrationDate DATETIME NOT NULL)";
     con.query(RegistrationsTb, function (err, result) {
         if (err) throw err;
         console.log("Table Registrations Created");
@@ -1090,6 +1094,21 @@ con.connect(function (err) {
                 })
             }
         })
+    });
+
+    //Accept challengeSuggestion
+
+    app.post('/api/challengeSuggestions/Accept', (req, res) =>{
+        const { name, description, link, solution, classificationID, difficulty } = req.body;
+        var fileName = link.substring(link.lastIndexOf('/'), link.length);
+        mv('./uploads/'+fileName, '../reactapp/src/challenges/'+fileName, function(err) {
+            if(err){
+                console.log(err);
+            }
+            else{
+                console.log('Ficheiro movido com sucesso');
+            }
+          });
     });
 
     //Delete challengeSuggestions
