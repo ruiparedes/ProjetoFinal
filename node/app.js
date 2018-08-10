@@ -48,6 +48,9 @@ app.use((req, res, next) => {
 });
 
 
+
+
+
 //Database Connection
 
 
@@ -247,6 +250,24 @@ var con = mysql.createConnection({
     password: "admin",
     database: 'db_projeto',
 });
+
+
+function checkCompetitionDate(){
+    const SELECT_ALL_COMPETITIONS_QUERY = 'SELECT * FROM competitions';
+    con.query(SELECT_ALL_COMPETITIONS_QUERY, (err, results) => {
+        console.log(results);
+        for(var i=0;i<results.length;i++){
+            if((results[i].endDate <= Date.now()) && results[i].status=='Open'){
+                console.log('Competição '+results[i].name+' fechada');
+            }
+            else{
+                console.log('Competição '+results[i].name+' inalterada');
+            }
+        }
+    });
+}
+
+setInterval(checkCompetitionDate, 1000);
 
 
 con.connect(function (err) {
