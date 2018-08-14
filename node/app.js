@@ -252,16 +252,60 @@ var con = mysql.createConnection({
 });
 
 
-function checkCompetitionDate(){
+function checkCompetitionDate() {
     const SELECT_ALL_COMPETITIONS_QUERY = 'SELECT * FROM competitions';
     con.query(SELECT_ALL_COMPETITIONS_QUERY, (err, results) => {
         console.log(results);
-        for(var i=0;i<results.length;i++){
-            if((results[i].endDate <= Date.now()) && results[i].status=='Open'){
-                console.log('Competição '+results[i].name+' fechada');
+        for (var i = 0; i < results.length; i++) {
+            if ((results[i].endDate <= Date.now()) && results[i].status == 'Open') {
+                console.log('Competição ' + results[i].name + ' fechada');
+                const ALTER_COMPETITION_STATE_QUERY = `UPDATE competitions SET status = ´Closed´ WHERE id = ${results[i].id}`;
+                con.query(ALTER_COMPETITION_STATE_QUERY, (err, competitionAltered) => {
+                    if (err) {
+                        console.log(err);
+                    }
+                    else {
+                        console.log('Alteração realizada ao estado da competição ' + competitionAltered[i].name);
+                        const SELECT_ALL_COMPETITION_CHALLENGES_QUERY = `SELECT * from ChallengesPerCompetition where competitionID = ${competitionAltered[i].id}`;
+                        con.query(SELECT_ALL_COMPETITION_CHALLENGES_QUERY, (err, competitionChallenges) => {
+                            if (err) {
+                                console.log(err);
+                            }
+                            else {
+                                const SELECT_ALL_PARTICIPANTS_QUERY = `SELECT * FROM registrations where competitionID = ${competitionAltered[i].id}`;
+                                con.query(SELECT_ALL_PARTICIPANTS_QUERY, (err, participants) =>{
+                                    if(err){
+                                        console.log(err);
+                                    }
+                                    else{
+                                        for(j=0; j<participants.length;j++){
+                                            var totalPoints = 0;
+                                            for(k=0;k<competitionChallenges.length; k++){
+                                                //FALTA TEMPO
+                                                const CHECK_PARTICIPANT_SCORE_CHALLENGE_QUERY = `SELECT score from scorePerChallengePerCompetition where registrationID = ${participants.id} and challengesPerCompetitionID = ${competitionChallenges.id}`;
+                                                con.query(CHECK_PARTICIPANT_SCORE_CHALLENGE_QUERY, (err, participantsScore) =>{
+                                                    if(err){
+                                                        console.log(err);
+                                                    }
+                                                    else{
+                                                        //PARA O TEMPO, FAZER COMPARAÇÂO, SE FOR MAIOR; TROCA, SE NAO; MANTEM ATUAL
+                                                       totalPoints = participantsScore.score;
+                                                       const GENERATE_SCOREBOARD_COMPETITION_QUERY = `UPDATE registrations SET finalScore= ${totalPoints} where id= ${participants.id} and competitionID = ${competitionAltered.id} )`;     
+                                                    }
+                                                })
+                                            }
+                                        }
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+
+                
             }
-            else{
-                console.log('Competição '+results[i].name+' inalterada');
+            else {
+                console.log('Competição ' + results[i].name + ' inalterada');
             }
         }
     });
@@ -1119,17 +1163,17 @@ con.connect(function (err) {
 
     //Accept challengeSuggestion
 
-    app.post('/api/challengeSuggestions/Accept', (req, res) =>{
+    app.post('/api/challengeSuggestions/Accept', (req, res) => {
         const { name, description, link, solution, classificationID, difficulty } = req.body;
         var fileName = link.substring(link.lastIndexOf('/'), link.length);
-        mv('./uploads/'+fileName, '../reactapp/src/challenges/'+fileName, function(err) {
-            if(err){
+        mv('./uploads/' + fileName, '../reactapp/src/challenges/' + fileName, function (err) {
+            if (err) {
                 console.log(err);
             }
-            else{
+            else {
                 console.log('Ficheiro movido com sucesso');
             }
-          });
+        });
     });
 
     //Delete challengeSuggestions
