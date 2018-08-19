@@ -251,67 +251,170 @@ var con = mysql.createConnection({
     database: 'db_projeto',
 });
 
+setInterval(inicialFunction, 1000);
 
-function checkCompetitionDate() {
-    const SELECT_ALL_COMPETITIONS_QUERY = 'SELECT * FROM competitions';
-    con.query(SELECT_ALL_COMPETITIONS_QUERY, (err, results) => {
-        console.log(results);
-        for (var i = 0; i < results.length; i++) {
-            if ((results[i].endDate <= Date.now()) && results[i].status == 'Open') {
-                console.log('Competição ' + results[i].name + ' fechada');
-                const ALTER_COMPETITION_STATE_QUERY = `UPDATE competitions SET status = ´Closed´ WHERE id = ${results[i].id}`;
-                con.query(ALTER_COMPETITION_STATE_QUERY, (err, competitionAltered) => {
-                    if (err) {
-                        console.log(err);
-                    }
-                    else {
-                        console.log('Alteração realizada ao estado da competição ' + competitionAltered[i].name);
-                        const SELECT_ALL_COMPETITION_CHALLENGES_QUERY = `SELECT * from ChallengesPerCompetition where competitionID = ${competitionAltered[i].id}`;
-                        con.query(SELECT_ALL_COMPETITION_CHALLENGES_QUERY, (err, competitionChallenges) => {
-                            if (err) {
-                                console.log(err);
-                            }
-                            else {
-                                const SELECT_ALL_PARTICIPANTS_QUERY = `SELECT * FROM registrations where competitionID = ${competitionAltered[i].id}`;
-                                con.query(SELECT_ALL_PARTICIPANTS_QUERY, (err, participants) =>{
-                                    if(err){
-                                        console.log(err);
-                                    }
-                                    else{
-                                        for(j=0; j<participants.length;j++){
-                                            var totalPoints = 0;
-                                            for(k=0;k<competitionChallenges.length; k++){
-                                                //FALTA TEMPO
-                                                const CHECK_PARTICIPANT_SCORE_CHALLENGE_QUERY = `SELECT score from scorePerChallengePerCompetition where registrationID = ${participants.id} and challengesPerCompetitionID = ${competitionChallenges.id}`;
-                                                con.query(CHECK_PARTICIPANT_SCORE_CHALLENGE_QUERY, (err, participantsScore) =>{
-                                                    if(err){
-                                                        console.log(err);
-                                                    }
-                                                    else{
-                                                        //PARA O TEMPO, FAZER COMPARAÇÂO, SE FOR MAIOR; TROCA, SE NAO; MANTEM ATUAL
-                                                       totalPoints = participantsScore.score;
-                                                       const GENERATE_SCOREBOARD_COMPETITION_QUERY = `UPDATE registrations SET finalScore= ${totalPoints} where id= ${participants.id} and competitionID = ${competitionAltered.id} )`;     
-                                                    }
-                                                })
-                                            }
-                                        }
-                                    }
-                                })
-                            }
-                        })
-                    }
-                })
-
-                
-            }
-            else {
-                console.log('Competição ' + results[i].name + ' inalterada');
+function inicialFunction() {
+    var goCheckCompetitionData = checkCompetitionDate();
+    goCheckCompetitionData.then(function (result) {
+        var competitions = result;
+        console.log(competitions);
+        for (var i = 0; i < competitions.length; i++) {
+            if ((competitions[i].endDate <= Date.now()) && competitions[i].status == 'Open') {
+                console.log('Competição ' + competitions[i].name + ' fechada');
+                closeCompetition(competitions[i].id);
             }
         }
-    });
+
+    })
 }
 
-setInterval(checkCompetitionDate, 1000);
+function checkCompetitionDate() {
+    return new Promise(function (resolve, reject) {
+        const SELECT_ALL_COMPETITIONS_QUERY = 'SELECT * FROM competitions';
+        con.query(SELECT_ALL_COMPETITIONS_QUERY, (err, results) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(results);
+            }
+        });
+    })
+}
+
+function closeCompetition(competitionToClose) {
+    return new Promise(function (resolve, reject) {
+        const ALTER_COMPETITION_STATE_QUERY = `UPDATE competitions SET status = 'Closed' WHERE id = ${competitionToClose}`;
+        con.query(ALTER_COMPETITION_STATE_QUERY, (err, competitionAltered) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                console.log('Competição com ID:' + competitionToClose + ' fechada');
+                var goCheckCompetitionChallenges = checkCompetitionChallenges(competitionToClose);
+                goCheckCompetitionChallenges.then(function (competitionChallenges) {
+                    var selectedChallenges = competitionChallenges;
+                    var competitionParticipants = checkAllParticipants(competitionToClose);
+                    competitionParticipants.then(function (participants) {
+                        var allParticipants = participants;
+                        console.log('TODAS AS CHALLENGES: ');
+                        console.log(selectedChallenges);
+                        console.log('TODAS OS PARTICIPANTES');
+                        console.log(allParticipants);
+                        for (var j = 0; j < allParticipants.length; j++) {
+                            for (k = 0; k < selectedChallenges.length; k++) {
+                                checkParticipantScore(allParticipants[j].id, selectedChallenges[k].id, competitionToClose);
+                            }
+                        }
+                    })
+
+                })
+
+
+            }
+        })
+    })
+}
+
+function checkCompetitionChallenges(competitionID) {
+    return new Promise(function (resolve, reject) {
+        const SELECT_ALL_COMPETITION_CHALLENGES_QUERY = `SELECT * from ChallengesPerCompetition where competitionID = ${competitionID}`;
+        con.query(SELECT_ALL_COMPETITION_CHALLENGES_QUERY, (err, competitionChallenges) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                console.log(competitionChallenges);
+                resolve(competitionChallenges);
+            }
+        })
+    })
+}
+
+function checkAllParticipants(competitionID) {
+    return new Promise(function (resolve, reject) {
+        const SELECT_ALL_PARTICIPANTS_QUERY = `SELECT * FROM registrations where competitionID = ${competitionID}`;
+        con.query(SELECT_ALL_PARTICIPANTS_QUERY, (err, participants) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                console.log(participants);
+                resolve(participants);
+            }
+        })
+    })
+
+}
+
+function checkParticipantScore(participantID, challengeID, competitionID) {
+    return new Promise(function (resolve, reject) {
+        const CHECK_PARTICIPANT_SCORE_CHALLENGE_QUERY = `SELECT score from scorePerChallengePerCompetition where registrationID = ${participantID} and challengesPerCompetitionID = ${challengeID}`;
+        con.query(CHECK_PARTICIPANT_SCORE_CHALLENGE_QUERY, (err, participantsScore) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                console.log('SCORE DO UTILIZADOR: ' + participantID + ' na challenge: ' + challengeID);
+                console.log(participantsScore);
+                   var finalScoreParticipant = getFinalScoreParticipant(participantID, competitionID);
+                   finalScoreParticipant.then(function(participantFinalScore){
+                       if(participantsScore.length==0){
+                           console.log('OBJETO VAZIO');
+                       }
+                        else{
+                            console.log('Objeto com valor: ');
+                            console.log(participantsScore[0].score);
+                            var participantATMScore = participantFinalScore[0].finalScore;
+                            participantATMScore +=participantsScore[0].score;
+                            console.log('SCORE A ADICIONAR :'+ participantATMScore);
+                            createScoreboard(participantID, competitionID, participantATMScore);
+                        }
+
+                   })
+            }
+        })
+    })
+}
+
+function getFinalScoreParticipant(participantID, competitionID) {
+    return new Promise(function (resolve, reject) {
+        const CHECK_PARTICIPANT_FINAL_SCORE_QUERY = `SELECT finalScore from registrations where id = ${participantID} and competitionID= ${competitionID}`;
+        con.query(CHECK_PARTICIPANT_FINAL_SCORE_QUERY, (err, participantFinalScore) => {
+            if(err){
+                reject(err);
+            }
+            else{
+                console.log('FINAL SCORE FUNÇAO getFinalScoreParticipant ');
+                console.log(participantFinalScore);
+                resolve(participantFinalScore);
+            }
+        })
+    })
+}
+
+function createScoreboard(participantID, competitionID, totalScore) {
+        console.log('PARTICIPANTE RECEBIDO: '+participantID);
+        console.log('COMPETIÇÃO RECEBIDA: '+competitionID);
+        console.log('TOTALSCORE RECEBIDO: '+totalScore);
+        const GENERATE_SCOREBOARD_COMPETITION_QUERY = `UPDATE registrations SET finalScore= ${totalScore} where id= ${participantID} and competitionID = ${competitionID} `;
+        con.query(GENERATE_SCOREBOARD_COMPETITION_QUERY, (err, scoreboard) => {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                console.log('UPDATE REALIZADO À PONTUAÇÃO DO JOGADOR:' + participantID + 'na competição: ' + competitionID + 'adicionando: ' + totalScore + ' pontos');
+                console.log(scoreboard);
+            }
+        })
+
+}
+
+
+
+
+
+
 
 
 con.connect(function (err) {
@@ -766,7 +869,7 @@ con.connect(function (err) {
     app.post('/api/scorePerChallengePerCompetition/Add', (req, res) => {
         const { registrationID, challengesPerCompetitionID, score, time } = req.body;
         console.log(registrationID, challengesPerCompetitionID, score, time);
-        const INSERT_SCOREPERCHALLENGEPERCOMPETITION_QUERY = `INSERT INTO scorePerChallengePerCompetition (registrationID, challengesPerCompetitionID, score) VALUES(${registrationID}, ${challengesPerCompetitionID}, ${score}, ${time} )`;
+        const INSERT_SCOREPERCHALLENGEPERCOMPETITION_QUERY = `INSERT INTO scorePerChallengePerCompetition (registrationID, challengesPerCompetitionID, score, time) VALUES(${registrationID}, ${challengesPerCompetitionID}, ${score}, ${time} )`;
         con.query(INSERT_SCOREPERCHALLENGEPERCOMPETITION_QUERY, (err, results) => {
             if (err) {
                 return res.send(err)
@@ -777,7 +880,7 @@ con.connect(function (err) {
         });
     });
 
-    //Delete challengesPerCompetition
+    //Delete scorePerChallengePerCompetition
 
     app.post('/api/scorePerChallengePerCompetition/Delete', (req, res) => {
         const id = req.body.id;
