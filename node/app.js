@@ -281,14 +281,29 @@ function checkCompetitionDate() {
 
 //3ª Função
 async function doLoopThroughCompetitions(competitions){
-    for(let i =0;i<competitions.length;i++){
+    for(var i in competitions){
         if ((competitions[i].endDate <= Date.now()) && competitions[i].status == 'Open') {
             console.log('Competição ' + competitions[i].name + ' fechada'); 
             await closeCompetition(competitions[i].id);
-            console.log('Após Fechar');
-
         }
     }
+}
+
+function checkParticipantsPlaces(competitionClosed){
+return new Promise(function(resolve,reject){
+    const SELECT_PARTICIPANTS_ORDERBY_FinalScore_FinalTime = `SELECT id, finalScore, finalTime from registrations where competitionID = ${competitionClosed} ORDER BY finalScore DESC, finalTime ASC`;
+    con.query(SELECT_PARTICIPANTS_ORDERBY_FinalScore_FinalTime, (err, participantsOrderBy) => {
+        if(err){
+            reject(err);
+        }
+        else{
+            console.log('Participantes por order: ');
+            console.log(participantsOrderBy);
+            resolve(participantsOrderBy);
+        }
+    })
+})
+
 }
 
 //4ª Função
@@ -365,27 +380,54 @@ async function doLoopThroughParticipantsAndChallenges(participants, challenges, 
     console.log('Challenges:');
     console.log(challenges);
     for (var participant in participants) {
-        let finalParticipantScore = 0;
+        let finalParticipantScore = 0
+        let finalParticipantTime=0;
         for (var challenge in challenges) {
             console.log('Participante:'+participants[participant].id);
             console.log('Challenge:'+challenges[challenge].id);
           await checkParticipantScoreChallenge(participants[participant].id, challenges[challenge].id).then(function(participantScoreOnChallenge){
             if(participantScoreOnChallenge.length!=0){
                 finalParticipantScore += participantScoreOnChallenge[0].score;
+                if(finalParticipantTime<participantScoreOnChallenge[0].time){
+                    finalParticipantTime = participantScoreOnChallenge[0].time;
+                }
             }
             console.log('Score FINAL do participant '+participants[participant].id+': '+finalParticipantScore);
-            console.log(finalParticipantScore);
-            createScoreboard(participants[participant].id, competitionToClose, finalParticipantScore);
+            console.log('Tempo FINAL do participant '+participants[participant].id+': '+finalParticipantTime);
+            createScoreboard(participants[participant].id, competitionToClose, finalParticipantScore, finalParticipantTime);
           });
         }   
         console.log('Processou tudo participante:'+participants[participant].id);
     }
+    checkParticipantsPlaces(competitionToClose).then(function(participantsOrderBy){
+        var pos = 1;
+        for (var rank in participantsOrderBy){
+            console.log(rank)
+            insertParticipantPlace(participantsOrderBy[rank].id, pos);
+            pos ++;
+        }
+    })
     console.log('Chegou ao fim do processo para a competição:'+competitionToClose);
+}
+
+function insertParticipantPlace(participantID, place){
+    return new Promise(function(resolve, reject){
+        const INSERT_PARTICIPANT_PLACE_QUERY = `UPDATE registrations SET place = ${place} where id= ${participantID}`;
+        con.query(INSERT_PARTICIPANT_PLACE_QUERY, (err, updatedParticipantPlace) =>{
+            if(err){
+                reject(err);
+            }
+            else{
+                console.log('Posição adicionada ao participant: '+participantID +' lugar: '+place);
+                resolve(updatedParticipantPlace);
+            }
+        })
+    })
 }
 
 function checkParticipantScoreChallenge(participantID, challengeID){
     return new Promise(function (resolve, reject) {
-    const CHECK_PARTICIPANT_SCORE_CHALLENGE_QUERY = `SELECT score from scorePerChallengePerCompetition where registrationID = ${participantID} and challengesPerCompetitionID = ${challengeID}`;
+    const CHECK_PARTICIPANT_SCORE_CHALLENGE_QUERY = `SELECT score, time from scorePerChallengePerCompetition where registrationID = ${participantID} and challengesPerCompetitionID = ${challengeID}`;
         con.query(CHECK_PARTICIPANT_SCORE_CHALLENGE_QUERY, (err, participantScoreOnChallenge) => {
             if(err){
                 console.log(err);
@@ -402,18 +444,19 @@ function checkParticipantScoreChallenge(participantID, challengeID){
 
 
 //10ª Função
-function createScoreboard(participantID, competitionID, totalScore) {
+function createScoreboard(participantID, competitionID, totalScore, totalTime) {
     return new Promise(function(resolve, reject){
         console.log('PARTICIPANTE RECEBIDO: '+participantID);
         console.log('COMPETIÇÃO RECEBIDA: '+competitionID);
         console.log('TOTALSCORE RECEBIDO: '+totalScore);
-        const GENERATE_SCOREBOARD_COMPETITION_QUERY = `UPDATE registrations SET finalScore= ${totalScore} where id= ${participantID} and competitionID = ${competitionID} `;
+        console.log('TOTALSCORE RECEBIDO: '+totalTime);
+        const GENERATE_SCOREBOARD_COMPETITION_QUERY = `UPDATE registrations SET finalScore= ${totalScore}, finalTime = ${totalTime} where id= ${participantID} and competitionID = ${competitionID} `;
         con.query(GENERATE_SCOREBOARD_COMPETITION_QUERY, (err, scoreboard) => {
             if (err) {
                 reject(err);
             }
             else {
-                console.log('UPDATE REALIZADO À PONTUAÇÃO DO JOGADOR:' + participantID + 'na competição: ' + competitionID + 'adicionando: ' + totalScore + ' pontos');
+                console.log('UPDATE REALIZADO À PONTUAÇÃO DO JOGADOR:' + participantID + 'na competição: ' + competitionID + 'adicionando: ' + totalScore + ' pontos' + ' num tempo de '+totalTime);
                 console.log(scoreboard);
             }
         })
@@ -446,7 +489,7 @@ con.connect(function (err) {
         console.log("Table Competitions Created");
     });
 
-    var RegistrationsTb = "CREATE TABLE if not exists registrations (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL, competitionID INT NOT NULL, finalScore INT(3), finalTime INT(6) ,FOREIGN KEY (userID) REFERENCES users(id), FOREIGN KEY (competitionID) REFERENCES competitions(id), registrationDate DATETIME NOT NULL)";
+    var RegistrationsTb = "CREATE TABLE if not exists registrations (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL, competitionID INT NOT NULL, finalScore INT(3), finalTime INT(6), place INT(2) ,FOREIGN KEY (userID) REFERENCES users(id), FOREIGN KEY (competitionID) REFERENCES competitions(id), registrationDate DATETIME NOT NULL)";
     con.query(RegistrationsTb, function (err, result) {
         if (err) throw err;
         console.log("Table Registrations Created");
