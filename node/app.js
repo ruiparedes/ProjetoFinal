@@ -258,9 +258,8 @@ function inicialFunction() {
     var goCheckCompetitionData = checkCompetitionDate();
     goCheckCompetitionData.then(function (result) {
         var competitions = result;
-        console.log(competitions);
         doLoopThroughCompetitions(competitions);
-        
+
     })
 }
 
@@ -280,34 +279,32 @@ function checkCompetitionDate() {
 }
 
 //3ª Função
-async function doLoopThroughCompetitions(competitions){
-    for(var i in competitions){
+async function doLoopThroughCompetitions(competitions) {
+    for (var i in competitions) {
         if ((competitions[i].endDate <= Date.now()) && competitions[i].status == 'Open') {
-            console.log('Competição ' + competitions[i].name + ' fechada'); 
+            console.log('Competição ' + competitions[i].name + ' fechada');
             await closeCompetition(competitions[i].id);
         }
     }
 }
 
-function checkParticipantsPlaces(competitionClosed){
-return new Promise(function(resolve,reject){
-    const SELECT_PARTICIPANTS_ORDERBY_FinalScore_FinalTime = `SELECT id, finalScore, finalTime from registrations where competitionID = ${competitionClosed} ORDER BY finalScore DESC, finalTime ASC`;
-    con.query(SELECT_PARTICIPANTS_ORDERBY_FinalScore_FinalTime, (err, participantsOrderBy) => {
-        if(err){
-            reject(err);
-        }
-        else{
-            console.log('Participantes por order: ');
-            console.log(participantsOrderBy);
-            resolve(participantsOrderBy);
-        }
+function checkParticipantsPlaces(competitionClosed) {
+    return new Promise(function (resolve, reject) {
+        const SELECT_PARTICIPANTS_ORDERBY_FinalScore_FinalTime = `SELECT id, finalScore, finalTime from registrations where competitionID = ${competitionClosed} ORDER BY finalScore DESC, finalTime ASC`;
+        con.query(SELECT_PARTICIPANTS_ORDERBY_FinalScore_FinalTime, (err, participantsOrderBy) => {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(participantsOrderBy);
+            }
+        })
     })
-})
 
 }
 
 //4ª Função
- function closeCompetition(competitionToClose) {
+function closeCompetition(competitionToClose) {
     return new Promise(function (resolve, reject) {
         const ALTER_COMPETITION_STATE_QUERY = `UPDATE competitions SET status = 'Closed' WHERE id = ${competitionToClose}`;
         con.query(ALTER_COMPETITION_STATE_QUERY, (err, competitionAltered) => {
@@ -315,18 +312,12 @@ return new Promise(function(resolve,reject){
                 console.log(err);
             }
             else {
-                console.log(competitionAltered);
-
                 var goCheckCompetitionChallenges = checkCompetitionChallenges(competitionToClose);
                 goCheckCompetitionChallenges.then(function (competitionChallenges) {
                     var selectedChallenges = competitionChallenges;
                     var competitionParticipants = checkAllParticipants(competitionToClose);
                     competitionParticipants.then(function (participants) {
                         var allParticipants = participants;
-                        console.log('TODAS AS CHALLENGES: ');
-                        console.log(selectedChallenges);
-                        console.log('TODAS OS PARTICIPANTES');
-                        console.log(allParticipants);
                         doLoopThroughParticipantsAndChallenges(allParticipants, selectedChallenges, competitionToClose);
                     })
 
@@ -372,69 +363,58 @@ function checkAllParticipants(competitionID) {
 }
 
 //7ª Função
-async function doLoopThroughParticipantsAndChallenges(participants, challenges, competitionToClose){
-    console.log(participants.length);
-    console.log(challenges.length);
-    console.log('Participantes:');
-    console.log(participants);
-    console.log('Challenges:');
-    console.log(challenges);
+async function doLoopThroughParticipantsAndChallenges(participants, challenges, competitionToClose) {
     for (var participant in participants) {
         let finalParticipantScore = 0
-        let finalParticipantTime=0;
+        let finalParticipantTime = 0;
         for (var challenge in challenges) {
-            console.log('Participante:'+participants[participant].id);
-            console.log('Challenge:'+challenges[challenge].id);
-          await checkParticipantScoreChallenge(participants[participant].id, challenges[challenge].id).then(function(participantScoreOnChallenge){
-            if(participantScoreOnChallenge.length!=0){
-                finalParticipantScore += participantScoreOnChallenge[0].score;
-                if(finalParticipantTime<participantScoreOnChallenge[0].time){
-                    finalParticipantTime = participantScoreOnChallenge[0].time;
+            await checkParticipantScoreChallenge(participants[participant].id, challenges[challenge].id).then(function (participantScoreOnChallenge) {
+                if (participantScoreOnChallenge.length != 0) {
+                    finalParticipantScore += participantScoreOnChallenge[0].score;
+                    if (finalParticipantTime < participantScoreOnChallenge[0].time) {
+                        finalParticipantTime = participantScoreOnChallenge[0].time;
+                    }
                 }
-            }
-            console.log('Score FINAL do participant '+participants[participant].id+': '+finalParticipantScore);
-            console.log('Tempo FINAL do participant '+participants[participant].id+': '+finalParticipantTime);
-            createScoreboard(participants[participant].id, competitionToClose, finalParticipantScore, finalParticipantTime);
-          });
-        }   
-        console.log('Processou tudo participante:'+participants[participant].id);
+                createScoreboard(participants[participant].id, competitionToClose, finalParticipantScore, finalParticipantTime);
+            });
+        }
+        console.log('Processou tudo participante:' + participants[participant].id);
     }
-    checkParticipantsPlaces(competitionToClose).then(function(participantsOrderBy){
+    checkParticipantsPlaces(competitionToClose).then(function (participantsOrderBy) {
         var pos = 1;
-        for (var rank in participantsOrderBy){
+        for (var rank in participantsOrderBy) {
             console.log(rank)
             insertParticipantPlace(participantsOrderBy[rank].id, pos);
-            pos ++;
+            pos++;
         }
     })
-    console.log('Chegou ao fim do processo para a competição:'+competitionToClose);
+    console.log('Chegou ao fim do processo para a competição:' + competitionToClose);
 }
 
-function insertParticipantPlace(participantID, place){
-    return new Promise(function(resolve, reject){
+function insertParticipantPlace(participantID, place) {
+    return new Promise(function (resolve, reject) {
         const INSERT_PARTICIPANT_PLACE_QUERY = `UPDATE registrations SET place = ${place} where id= ${participantID}`;
-        con.query(INSERT_PARTICIPANT_PLACE_QUERY, (err, updatedParticipantPlace) =>{
-            if(err){
+        con.query(INSERT_PARTICIPANT_PLACE_QUERY, (err, updatedParticipantPlace) => {
+            if (err) {
                 reject(err);
             }
-            else{
-                console.log('Posição adicionada ao participant: '+participantID +' lugar: '+place);
+            else {
+                console.log('Posição adicionada ao participant: ' + participantID + ' lugar: ' + place);
                 resolve(updatedParticipantPlace);
             }
         })
     })
 }
 
-function checkParticipantScoreChallenge(participantID, challengeID){
+function checkParticipantScoreChallenge(participantID, challengeID) {
     return new Promise(function (resolve, reject) {
-    const CHECK_PARTICIPANT_SCORE_CHALLENGE_QUERY = `SELECT score, time from scorePerChallengePerCompetition where registrationID = ${participantID} and challengesPerCompetitionID = ${challengeID}`;
+        const CHECK_PARTICIPANT_SCORE_CHALLENGE_QUERY = `SELECT score, time from scorePerChallengePerCompetition where registrationID = ${participantID} and challengesPerCompetitionID = ${challengeID}`;
         con.query(CHECK_PARTICIPANT_SCORE_CHALLENGE_QUERY, (err, participantScoreOnChallenge) => {
-            if(err){
+            if (err) {
                 console.log(err);
             }
-            else{
-                console.log('Score do participante:'+participantID+' na challenge:'+challengeID);
-                console.log(participantScoreOnChallenge);
+            else {
+                console.log('Score do participante:' + participantID + ' na challenge:' + challengeID);
                 resolve(participantScoreOnChallenge);
             }
         })
@@ -445,23 +425,17 @@ function checkParticipantScoreChallenge(participantID, challengeID){
 
 //10ª Função
 function createScoreboard(participantID, competitionID, totalScore, totalTime) {
-    return new Promise(function(resolve, reject){
-        console.log('PARTICIPANTE RECEBIDO: '+participantID);
-        console.log('COMPETIÇÃO RECEBIDA: '+competitionID);
-        console.log('TOTALSCORE RECEBIDO: '+totalScore);
-        console.log('TOTALSCORE RECEBIDO: '+totalTime);
+    return new Promise(function (resolve, reject) {
         const GENERATE_SCOREBOARD_COMPETITION_QUERY = `UPDATE registrations SET finalScore= ${totalScore}, finalTime = ${totalTime} where id= ${participantID} and competitionID = ${competitionID} `;
         con.query(GENERATE_SCOREBOARD_COMPETITION_QUERY, (err, scoreboard) => {
             if (err) {
                 reject(err);
             }
             else {
-                console.log('UPDATE REALIZADO À PONTUAÇÃO DO JOGADOR:' + participantID + 'na competição: ' + competitionID + 'adicionando: ' + totalScore + ' pontos' + ' num tempo de '+totalTime);
-                console.log(scoreboard);
+                console.log('UPDATE REALIZADO À PONTUAÇÃO DO JOGADOR:' + participantID + 'na competição: ' + competitionID + 'adicionando: ' + totalScore + ' pontos' + ' num tempo de ' + totalTime);
             }
         })
     })
-       
 }
 
 
@@ -489,7 +463,7 @@ con.connect(function (err) {
         console.log("Table Competitions Created");
     });
 
-    var RegistrationsTb = "CREATE TABLE if not exists registrations (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL, competitionID INT NOT NULL, finalScore INT(3), finalTime INT(6), place INT(2) ,FOREIGN KEY (userID) REFERENCES users(id), FOREIGN KEY (competitionID) REFERENCES competitions(id), registrationDate DATETIME NOT NULL)";
+    var RegistrationsTb = "CREATE TABLE if not exists registrations (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL, competitionID INT NOT NULL, finalScore INT(3), finalTime INT(15), place INT(2) ,FOREIGN KEY (userID) REFERENCES users(id), FOREIGN KEY (competitionID) REFERENCES competitions(id), registrationDate DATETIME NOT NULL)";
     con.query(RegistrationsTb, function (err, result) {
         if (err) throw err;
         console.log("Table Registrations Created");
@@ -507,7 +481,7 @@ con.connect(function (err) {
         console.log("Table SubClassification Created");
     });
 
-    var ChallengesTb = "CREATE TABLE if not exists challenges (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL UNIQUE, description VARCHAR(5000) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (classificationID) REFERENCES classifications(id) )";
+    var ChallengesTb = "CREATE TABLE if not exists challenges (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL UNIQUE, description VARCHAR(5000) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(100) NOT NULL, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (classificationID) REFERENCES classifications(id) )";
     con.query(ChallengesTb, function (err, result) {
         if (err) throw err;
         console.log("Table Challenges Created");
@@ -519,7 +493,7 @@ con.connect(function (err) {
         console.log("Table ChallengesPerCompetition Created");
     });
 
-    var scorePerChallengePerCompetitionTb = "CREATE TABLE if not exists scorePerChallengePerCompetition (id INT AUTO_INCREMENT PRIMARY KEY, registrationID INT NOT NULL, challengesPerCompetitionID INT NOT NULL, FOREIGN KEY (registrationID) REFERENCES registrations(id), FOREIGN KEY (challengesPerCompetitionID) REFERENCES challengesPerCompetition(id), score INT(3) NOT NULL, time INT(6))";
+    var scorePerChallengePerCompetitionTb = "CREATE TABLE if not exists scorePerChallengePerCompetition (id INT AUTO_INCREMENT PRIMARY KEY, registrationID INT NOT NULL, challengesPerCompetitionID INT NOT NULL, FOREIGN KEY (registrationID) REFERENCES registrations(id), FOREIGN KEY (challengesPerCompetitionID) REFERENCES challengesPerCompetition(id), score INT(3) NOT NULL, time INT(15))";
     con.query(scorePerChallengePerCompetitionTb, function (err, result) {
         if (err) throw err;
         console.log("Table scorePerChallengePerCompetition Created");
@@ -543,17 +517,36 @@ con.connect(function (err) {
         console.log("Table QuizzQuestions Created");
     });
 
-    var QuestionSuggestionsTb = "CREATE TABLE if not exists questionSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, description VARCHAR(200) NOT NULL, answer1 VARCHAR(200), explanation1 VARCHAR(400), answer2 VARCHAR(200), explanation2 VARCHAR(400), answer3 VARCHAR(200), explanation3 VARCHAR(400), answer4 VARCHAR(200), explanation4 VARCHAR(400), correct VARCHAR(200) NOT NULL, difficulty INT(1) NOT NULL, userID INT NOT NULL, FOREIGN KEY (userID) REFERENCES users(id))";
+    var SuggestionsStatus = "CREATE TABLE if not exists suggestionsStatus (id INT AUTO_INCREMENT PRIMARY KEY,  status VARCHAR(30) NOT NULL UNIQUE)";
+    con.query(SuggestionsStatus, function (err, result) {
+        if (err) throw err;
+        const INSERT_STATUS_PENDING_QUERY = `INSERT into suggestionsStatus (status) VALUES('Pending')`;
+        const INSERT_STATUS_ACCEPTED_QUERY = `INSERT into suggestionsStatus (status) VALUES('Accepted')`;
+        const INSERT_STATUS_DENIED_QUERY = `INSERT into suggestionsStatus (status) VALUES('Denied')`;
+        con.query(INSERT_STATUS_PENDING_QUERY, (err, results) => {
+        });
+        con.query(INSERT_STATUS_ACCEPTED_QUERY, (err, results) => {
+        });
+        con.query(INSERT_STATUS_DENIED_QUERY, (err, results) => {
+        });
+
+
+        console.log("Table SuggestionsStatus Created AND Populated");
+    });
+
+    var QuestionSuggestionsTb = "CREATE TABLE if not exists questionSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, description VARCHAR(200) NOT NULL, answer1 VARCHAR(200), explanation1 VARCHAR(400), answer2 VARCHAR(200), explanation2 VARCHAR(400), answer3 VARCHAR(200), explanation3 VARCHAR(400), answer4 VARCHAR(200), explanation4 VARCHAR(400), correct VARCHAR(200) NOT NULL, difficulty INT(1) NOT NULL, userID INT NOT NULL, FOREIGN KEY (userID) REFERENCES users(id), statusID INT(1) NOT NULL, FOREIGN KEY (statusID) REFERENCES suggestionsStatus(id))";
     con.query(QuestionSuggestionsTb, function (err, result) {
         if (err) throw err;
         console.log("Table QuestionSuggestions Created");
     });
 
-    var ChallengeSuggestionsTb = "CREATE TABLE if not exists challengeSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL , name VARCHAR(30), description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, solution VARCHAR(100) NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (userID) REFERENCES users(id))";
+    var ChallengeSuggestionsTb = "CREATE TABLE if not exists challengeSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL , name VARCHAR(100), description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(100) NOT NULL, solution VARCHAR(100) NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (userID) REFERENCES users(id), statusID INT(1) NOT NULL, FOREIGN KEY (statusID) REFERENCES suggestionsStatus(id))";
     con.query(ChallengeSuggestionsTb, function (err, result) {
         if (err) throw err;
         console.log("Table ChallengeSuggestions Created");
     });
+
+
 
 
     //Methods DB
@@ -742,9 +735,9 @@ con.connect(function (err) {
     //Add Challenge
 
     app.post('/api/challenges/Add', (req, res) => {
-        const { name, description, link, solution, classificationID, difficulty } = req.body;
-        console.log(name, description, link, solution, classificationID, difficulty);
-        const INSERT_CHALLENGE_QUERY = `INSERT INTO challenges (name, description, link, solution, classificationID, difficulty) VALUES('${name}', '${description}', '${link}', '${solution}' , ${classificationID}, ${difficulty} )`;
+        const { name, description, link, mainFile, solution, classificationID, difficulty } = req.body;
+        console.log(name, description, link, mainFile, solution, classificationID, difficulty);
+        const INSERT_CHALLENGE_QUERY = `INSERT INTO challenges (name, description, link, mainFile, solution, classificationID, difficulty) VALUES('${name}', '${description}', '${link}', '${mainFile}', '${solution}' , ${classificationID}, ${difficulty} )`;
         con.query(INSERT_CHALLENGE_QUERY, (err, results) => {
             if (err) {
                 return res.send(err)
@@ -949,6 +942,65 @@ con.connect(function (err) {
             }
         });
     });
+
+    //PARTICIPANT GOT CORRECT ANSWER CHALLENGE
+
+    app.post('/api/scorePerChallengePerCompetition/getScore', (req, res) => {
+        const userID = req.body.userID;
+        const competitionID = req.body.competitionID;
+        const challengeID = req.body.challengeID;
+
+        const SELECT_COMPETITION_CHALLENGE_QUERY = `SELECT * from challengesPerCompetition where competitionID = ${competitionID} and challengeID= ${challengeID}`;
+        con.query(SELECT_COMPETITION_CHALLENGE_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err);
+            }
+            else {
+                const challengeScore = results[0].challengePoints;
+                const competitionChallengeID = results[0].id;
+                console.log(challengeScore);
+                console.log(competitionChallengeID);
+
+                const SELECT_COMPETITION_QUERY = `SELECT * from competitions where id = ${competitionID}`;
+                con.query(SELECT_COMPETITION_QUERY, (err, competitionInfo) => {
+                    if (err) {
+                        return res.send(err);
+                    }
+                    else {
+                        const competitionStartDate = competitionInfo[0].startDate;
+                        console.log(competitionStartDate);
+                        var time = Date.now() - competitionStartDate;
+                        console.log(time);
+
+                        const SELECT_PARTICIPANT_ID = `SELECT id from registrations where userID = ${userID} and competitionID = ${competitionID}`;
+                        con.query(SELECT_PARTICIPANT_ID, (err, participantInfo) => {
+                            if (err) {
+                                return res.send(err);
+                            }
+                            else {
+                                registrationID = participantInfo[0].id;
+                                const ADD_SCORE_PARTICIPANT_QUERY = `INSERT INTO scorePerChallengePerCompetition (registrationID, challengesPerCompetitionID, score, time) VALUES(${registrationID}, ${competitionChallengeID}, ${challengeScore}, ${time})`;
+                                con.query(ADD_SCORE_PARTICIPANT_QUERY, (err, insertedInfo) => {
+                                    if (err) {
+                                        return res.send(err);
+                                    }
+                                    else {
+                                        res.send({
+                                            "code": 200,
+                                            "success": "Added Score to Participant"
+                                        });
+                                    }
+                                })
+                            }
+                        })
+
+                    }
+                })
+
+
+            }
+        })
+    })
 
     //--------------------------------------------------------------------------------------------------------------------
 
@@ -1235,8 +1287,9 @@ con.connect(function (err) {
 
     app.post('/api/questionSuggestions/Add', (req, res) => {
         const { description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, userID } = req.body;
+        const status = 1;
         console.log(description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, userID);
-        const INSERT_QUESTIONSUGGESTIONS_QUERY = `INSERT INTO questionSuggestions (description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, userID) VALUES( '${description}', '${answer1}', '${explanation1}', '${answer2}', '${explanation2}', '${answer3}', '${explanation3}', '${answer4}', '${explanation4}', ${corret}, ${userID})`;
+        const INSERT_QUESTIONSUGGESTIONS_QUERY = `INSERT INTO questionSuggestions (description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, userID, status) VALUES( '${description}', '${answer1}', '${explanation1}', '${answer2}', '${explanation2}', '${answer3}', '${explanation3}', '${answer4}', '${explanation4}', ${corret}, ${userID}, ${status})`;
         con.query(INSERT_QUESTIONSUGGESTIONS_QUERY, (err, res) => {
             if (err) {
                 return res.send(err)
@@ -1291,19 +1344,24 @@ con.connect(function (err) {
         upload(req, res, (err) => {
             if (err) {
                 console.log("Erro no upload do ficheiro")
+                res.send(err);
             }
             else {
                 console.log(req.file);
                 const userID = req.body.userID;
                 const name = req.body.name;
                 const description = req.body.description;
-                const link = req.file.destination + req.file.filename;
+                var folderName = req.file.filename;
+                folderName = folderName.substring(0, folderName.lastIndexOf('.'));
+                const link = req.file.destination + folderName;
+                const mainFile = req.body.mainFile;
                 const solution = req.body.solution;
                 const difficulty = req.body.difficulty;
-                const ADD_CHALLENGESUGGESTION_QUERY = `INSERT INTO challengeSuggestions (userID, name, description, link, solution, difficulty) VALUES( ${userID}, '${name}', '${description}', '${link}', '${solution}', ${difficulty})`;
+                const statusID = 1;
+                const ADD_CHALLENGESUGGESTION_QUERY = `INSERT INTO challengeSuggestions (userID, name, description,  link, mainFile, solution, difficulty, statusID) VALUES( ${userID}, '${name}', '${description}', '${link}', '${mainFile}', '${solution}', ${difficulty}, ${statusID})`;
                 con.query(ADD_CHALLENGESUGGESTION_QUERY, (err, results) => {
                     if (err) {
-                        res.send(err)
+                        res.send(err);
                     }
                     else {
                         console.log("Challenge suggested:", results);
@@ -1321,16 +1379,38 @@ con.connect(function (err) {
     //Accept challengeSuggestion
 
     app.post('/api/challengeSuggestions/Accept', (req, res) => {
-        const { name, description, link, solution, classificationID, difficulty } = req.body;
+        const challengeSuggestionID = req.body.challengeSuggestionID;
+        const name = req.body.name;
+        const description = req.body.description;
+        const mainFile = req.body.mainFile;
+        const solution = req.body.solution;
+        const difficulty = req.body.difficulty;
+        const link = req.body.link;
+        const statusID = 2;
+        const classificationID = req.body.classificationID;
+        console.log(link);
         var fileName = link.substring(link.lastIndexOf('/'), link.length);
-        mv('./uploads/' + fileName, '../reactapp/src/challenges/' + fileName, function (err) {
-            if (err) {
-                console.log(err);
+        var modifiedLink = '../challenges' +fileName+'/'+mainFile;
+        const ACCEPT_CHALLENGE_SUGGESTION_QUERY = `INSERT INTO challenges (name, description, link, mainFile, solution, classificationID, difficulty) VALUES('${name}', '${description}', '${modifiedLink}', '${mainFile}', '${solution}', ${classificationID}, ${difficulty}) `;
+        con.query(ACCEPT_CHALLENGE_SUGGESTION_QUERY, (err, results) =>{
+            if(err){
+                return res.send(err);
             }
-            else {
-                console.log('Ficheiro movido com sucesso');
+            else{
+                const ALTER_CHALLENGE_SUGGESTION_STATUS = `UPDATE challengeSuggestions SET statusID = ${statusID} where id = ${challengeSuggestionID}`;
+                con.query(ALTER_CHALLENGE_SUGGESTION_STATUS, (err, updatedChallengeSuggestions) =>{
+                    mv('./uploads/' + fileName, '../reactapp/src/challenges/' + fileName, function (err) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        else {
+                            console.log('Ficheiro movido com sucesso');
+                        }
+                    });
+                })
             }
-        });
+        })
+        
     });
 
     //Delete challengeSuggestions
