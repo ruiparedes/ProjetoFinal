@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { URL } from '../shared/Constants';
 import './CompetitionsList.css';
+import { Route, Redirect } from 'react-router-dom';
 let localUser = JSON.parse(localStorage.getItem('userData'));
 
 class CompetitionsList extends React.Component {
@@ -8,17 +9,21 @@ class CompetitionsList extends React.Component {
         super(props);
         this.state = {
             competitions: [],
-            myCompetitions: []
+            myCompetitions: [],
+            competitionToEnter: null,
+            redirectToCompetitionChallenges: false
 
         }
         this.fetchCompetitions = this.fetchCompetitions.bind(this);
         this.fetchUserRegistrations = this.fetchUserRegistrations.bind(this);
         this.registerCompetition = this.registerCompetition.bind(this);
+        this.enterCompetition = this.enterCompetition.bind(this);
     }
 
 
     componentDidMount() {
-        window.competitionsListener = setInterval(() => this.fetchUserRegistrations(), 1000);
+        window.registrationsListener = setInterval(() => this.fetchUserRegistrations(), 1000);
+        window.competitionsListener = setInterval(() => this.fetchCompetitions(), 1000);
         this.fetchCompetitions();
         this.fetchUserRegistrations();
 
@@ -67,9 +72,25 @@ class CompetitionsList extends React.Component {
         });
     }
 
+    enterCompetition(competitionID){
+        console.log(competitionID);
+        this.setState({competitionToEnter: competitionID, redirectToCompetitionChallenges: true});
+
+    }
+
 
 
     render() {
+
+        if(this.state.redirectToCompetitionChallenges == true) {
+            console.log(this.state.competitionToEnter);
+            console.log('A FAZER REDIRECT');
+            this.setState({redirect: false});
+            return <Redirect to={{
+                pathname: '/competitionChallenges',
+                state: {competitionID: this.state.competitionToEnter},
+            }} />
+        }
 
         return (
             <div>

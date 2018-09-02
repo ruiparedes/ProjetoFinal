@@ -768,6 +768,24 @@ con.connect(function (err) {
 
     // CHALLENGESPERCOMPETITION METHODS -------------------------------------------------------------------------------------------------------------------------------------
 
+
+    //Get All Competition Challenges
+    app.get('/api/challengesPerCompetition/getCompetitionChallenges/:competitionID', (req, res) => {
+        const competitionID = req.params.competitionID;
+        const SELECT_ALL_COMPETITION_CHALLENGES_QUERY =`SELECT * FROM challengesPerCompetition where competitionID = ${competitionID}`;
+        con.query(SELECT_ALL_COMPETITION_CHALLENGES_QUERY, (err, results) =>{
+            if(err){
+                return res.send(err);
+            }
+            else{
+                return res.json({
+                    competitionChallenges: results
+                })
+            }
+        })
+    })
+    
+
     //Get challengesPerCompetition
     const SELECT_ALL_CHALLENGESPERCOMPETITION_QUERY = 'SELECT * FROM challengesPerCompetition';
 
@@ -860,19 +878,53 @@ con.connect(function (err) {
     app.post('/api/registrations/Add', (req, res) => {
         const userID = req.body.userID;
         const competitionID = req.body.competitionID;
-        const finalScore = 0;
-        const finalTime = 0;
-        const registrationDate = moment().format('DD-MM-YYYY');
-        console.log(userID, competitionID, finalScore, finalTime, registrationDate);
-        const INSERT_REGISTRATION_QUERY = `INSERT INTO registrations (userID, competitionID, finalScore, finalTime, registrationDate) VALUES(${userID}, ${competitionID}, ${finalScore}, ${finalTime}, STR_TO_DATE('${registrationDate}', '%d-%m-%Y'))`;
-        con.query(INSERT_REGISTRATION_QUERY, (err, results) => {
-            if (err) {
-                return res.send(err)
+        const CHECK_COMPETITION_NUMBER_PARTICIPANTS_QUERY = `SELECT * FROM competitions where id = ${competitionID}`;
+        con.query(CHECK_COMPETITION_NUMBER_PARTICIPANTS_QUERY, (err, competitionInfo) =>{
+            if(err){
+                return res.send(err);
             }
-            else {
-                return res.send('Sucessfully added the registration')
+            else{
+                console.log(competitionInfo);
+                if(competitionInfo[0].totalParticipants < competitionInfo[0].maxParticipants){
+                    console.log('The participant can register himself');
+                    const finalScore = 0;
+                    const finalTime = 0;
+                    const registrationDate = moment().format('DD-MM-YYYY');
+                    console.log(userID, competitionID, finalScore, finalTime, registrationDate);
+                    const INSERT_REGISTRATION_QUERY = `INSERT INTO registrations (userID, competitionID, finalScore, finalTime, registrationDate) VALUES(${userID}, ${competitionID}, ${finalScore}, ${finalTime}, STR_TO_DATE('${registrationDate}', '%d-%m-%Y'))`;
+                    con.query(INSERT_REGISTRATION_QUERY, (err, results) => {
+                        if (err) {
+                            return res.send(err)
+                        }
+                        else {
+                            var competitionParticipants = competitionInfo[0].totalParticipants;
+                            competitionParticipants +=1;
+                            console.log('Updating Competition Number of participants');
+                            const UPDATE_NUMBER_PARTICIPANTS_COMPETITION_QUERY = `UPDATE competitions SET totalParticipants = ${competitionParticipants} where id = ${competitionID}`;
+                            con.query(UPDATE_NUMBER_PARTICIPANTS_COMPETITION_QUERY, (err, competitionUpdatedInfo) =>{
+                                if(err){
+                                    return res.send(err);
+                                }
+                                else{
+                                    console.log('Competition number of participants updated successfully');
+                                    return res.send({
+                                        "code": 200,
+                                        "error": "The Participant was successfully added to the competition"
+                                    });
+                                }
+                            })
+                        }
+                    });
+                }
+                else{
+                    return res.send({
+                        "code": 405,
+                        "error": "The competition is already full!"
+                    });
+                }
             }
-        });
+        })
+        
     });
 
     //Delete REGISTRATIONS
@@ -1365,7 +1417,7 @@ con.connect(function (err) {
                     }
                     else {
                         console.log("Challenge suggested:", results);
-                        res.send({
+                        return res.send({
                             "code": 200,
                             "success": "Challenge Added to the suggestions"
                         });
@@ -1405,6 +1457,10 @@ con.connect(function (err) {
                         }
                         else {
                             console.log('Ficheiro movido com sucesso');
+                           return res.send({
+                                "code": 200,
+                                "success": "Challenge accepted sucessfully."
+                            })
                         }
                     });
                 })

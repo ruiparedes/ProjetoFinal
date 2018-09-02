@@ -31,7 +31,7 @@ class App extends React.Component {
                 <Route exact path="/attack/:nameId/" component={AttackPage} />
                 <Route exact path="/competitionsList" component={CompetitionsList} />
                 <Route exact path="/challengeSuggestion" component={ChallengeSuggestion} />
-                <Route exact path="/competitionChallenges/:name/" component={CompetitionChallenges} />
+                <Route exact path="/competitionChallenges" component={CompetitionChallenges} />
                 </Switch>
               </div>
           </div>
