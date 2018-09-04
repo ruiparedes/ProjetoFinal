@@ -644,6 +644,27 @@ con.connect(function (err) {
 
     // COMPETITIONS METHODS -------------------------------------------------------------------------------------------------------------------------------------
 
+
+    //Get Competition by ID
+
+    app.get('/api/getcompetitionByID/:id', (req, res) => {
+        const id = req.params.id;
+        const SELECT_COMPETITIONBYID_QUERY = `SELECT * FROM competitions where id = ${id}`;
+        con.query(SELECT_COMPETITIONBYID_QUERY, (err, results) => {
+            if (err) {
+                console.log("ERRO ERRO");
+                return res.send(err)
+            }
+            else {
+                console.log(results);
+                return res.json({
+                    competition: results[0]
+                })
+            }
+        });
+    });
+
+
     //Get Competitions
     const SELECT_ALL_COMPETITIONS_QUERY = `SELECT id, name, maxParticipants, status, maxScore, DATE_FORMAT(startDate, '%d-%m-%y') startDate, DATE_FORMAT(endDate, '%d-%m-%y') endDate, totalParticipants FROM competitions`;
 
@@ -772,12 +793,14 @@ con.connect(function (err) {
     //Get All Competition Challenges
     app.get('/api/challengesPerCompetition/getCompetitionChallenges/:competitionID', (req, res) => {
         const competitionID = req.params.competitionID;
-        const SELECT_ALL_COMPETITION_CHALLENGES_QUERY =`SELECT * FROM challengesPerCompetition where competitionID = ${competitionID}`;
+        const SELECT_ALL_COMPETITION_CHALLENGES_QUERY =`SELECT cpc.id, cpc.challengeID, cpc.challengeOrder, cpc.challengePoints, c.classificationID, cpc.competitionID, c.description, c.difficulty, c.link, c.mainFile, c.name  FROM challengesPerCompetition cpc, challenges c where cpc.competitionID = ${competitionID} and cpc.challengeID = c.id`;
         con.query(SELECT_ALL_COMPETITION_CHALLENGES_QUERY, (err, results) =>{
             if(err){
                 return res.send(err);
             }
             else{
+                console.log('Challenges da Competição')
+                console.log(results);
                 return res.json({
                     competitionChallenges: results
                 })
@@ -946,6 +969,108 @@ con.connect(function (err) {
     //--------------------------------------------------------------------------------------------------------------------
 
     // scorePerChallengePerCompetition METHODS -------------------------------------------------------------------------------------------------------------------------------------
+
+    app.get('/api/scorePerChallengePerCompetition/challengesDone/:competitionID/:userID', (req, res) =>{
+        const competitionID = req.params.competitionID;
+        const userID = req.params.userID;
+
+        const GET_PARTICIPANT_ID_QUERY = `SELECT id from registrations where userID = ${userID} and competitionID = ${competitionID}`;
+        con.query(GET_PARTICIPANT_ID_QUERY, (err, participantInfo) =>{
+            if(err){
+                return res.send(err);
+            }
+            else{
+                console.log(participantInfo[0].id);
+                participantID = participantInfo[0].id;
+                const GET_COMPETITION_CHALLENGES_ID_QUERY = `SELECT id from challengesPerCompetition where competitionID =${competitionID}`;
+                var challenges = [];
+                con.query(GET_COMPETITION_CHALLENGES_ID_QUERY, (err, competitionChallenges) =>{
+                    if(err){
+                        return res.send(err);
+                    }
+                    else{
+                        console.log(competitionChallenges)
+                        for(var i in competitionChallenges){
+                            challenges[i] = competitionChallenges[i].id;
+                        }
+                        console.log(challenges);
+        
+                        const GET_CHALLENGES_DONE = `SELECT * FROM scorePerChallengePerCompetition where registrationID = ${participantID} and id IN (${challenges.join()})`;
+                        con.query(GET_CHALLENGES_DONE, (err, challengesDone) =>{
+                            if(err){
+                                return res.send(err);
+                            }
+                            else{
+                                console.log(challengesDone);
+                                return res.json({
+                                    challengesDone: challengesDone
+                                })  
+                            }
+                        })
+        
+                    }
+                })
+
+
+            }
+        })
+
+
+        
+    })
+
+
+
+/*app.get('/api/scorePerChallengePerCompetition/checkChallengeDone/:challengePerCompetitionID/:registrationID', (err, res) =>{
+    const challengePerCompetitionID = req.params.challengePerCompetitionID;
+    const registrationID = req.params.registrationID;
+
+    const CHECK_CHALLENGE_IS_DONE__QUERY = `SELECT * from scorePerChallengePerCompetition where registrationID = ${registrationID} and challengesPerCompetitionID = ${challengePerCompetitionID}`
+    con.query(CHECK_CHALLENGE_IS_DONE__QUERY, (err, challengeDoneInfo) =>{
+        if(err){
+            return res.send(err);
+        }
+        else{
+            return res.json({
+                challengeDoneInfo: challengeDoneInfo
+            })  
+        }
+    })
+})*/
+    
+
+    app.get('/api/registrations/participantInfo/:competitionID/:userID', (req, res) =>{
+        console.log(req.params);
+        const competitionID = req.params.competitionID;
+        const userID = req.params.userID;
+        console.log(competitionID);
+        console.log(userID);
+        const GET_PARTICIPANT_ID_QUERY = `SELECT id from registrations where userID = ${userID} and competitionID = ${competitionID}`;
+        con.query(GET_PARTICIPANT_ID_QUERY, (err, participantInfo) =>{
+            if(err){
+                return res.send(err);
+            }
+            else{
+                console.log('PARTICIPANT ID: ');
+                console.log(participantInfo[0].id);
+                let participantID = participantInfo[0].id;
+                const SELECT_PARTICIPANT_TOTAL_SCORE_QUERY = `SELECT * from registrations where id = ${participantID}`;
+                con.query(SELECT_PARTICIPANT_TOTAL_SCORE_QUERY, (err, particiapantInfo) =>{
+                    if(err) {
+                        return res.send(err);
+                    }
+                    else{
+                        return res.json({
+                            participantInfo: particiapantInfo[0]
+                        })
+                    }
+                })
+
+            }
+        })
+
+    })
+
 
     //Get scorePerChallengePerCompetition
     const SELECT_ALL_SCOREPERCHALLENGEPERCOMPETITION_QUERY = 'SELECT * FROM scorePerChallengePerCompetition';
