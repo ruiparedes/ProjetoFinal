@@ -281,7 +281,7 @@ function checkCompetitionDate() {
 //3ª Função
 async function doLoopThroughCompetitions(competitions) {
     for (var i in competitions) {
-        if ((competitions[i].endDate <= Date.now()) && competitions[i].status == 'Open') {
+        if ((competitions[i].endDate <= Date.now()) && competitions[i].statusID == 2) {
             console.log('Competição ' + competitions[i].name + ' fechada');
             await closeCompetition(competitions[i].id);
         }
@@ -306,7 +306,7 @@ function checkParticipantsPlaces(competitionClosed) {
 //4ª Função
 function closeCompetition(competitionToClose) {
     return new Promise(function (resolve, reject) {
-        const ALTER_COMPETITION_STATE_QUERY = `UPDATE competitions SET status = 'Closed' WHERE id = ${competitionToClose}`;
+        const ALTER_COMPETITION_STATE_QUERY = `UPDATE competitions SET statusID = 4 WHERE id = ${competitionToClose}`;
         con.query(ALTER_COMPETITION_STATE_QUERY, (err, competitionAltered) => {
             if (err) {
                 console.log(err);
@@ -455,9 +455,42 @@ con.connect(function (err) {
         console.log("Table Users Created");
     });
 
+    var DifficultyTb = "CREATE TABLE if not exists difficulty (id INT AUTO_INCREMENT PRIMARY KEY, level VARCHAR(20) NOT NULL UNIQUE)";
+    con.query(DifficultyTb, function (err, result) {
+        if (err) throw err;
+        
+        const INSERT_DIFFICULTY_EASY_QUERY = `INSERT into difficulty (level) VALUES('Easy')`;
+        const INSERT_DIFFICULTY_NORMAL_QUERY = `INSERT into difficulty (level) VALUES('Normal')`;
+        const INSERT_DIFFICULTY_HARD_QUERY = `INSERT into difficulty (level) VALUES('Hard')`;
+        con.query(INSERT_DIFFICULTY_EASY_QUERY, (err, results) => {
+        });
+        con.query(INSERT_DIFFICULTY_NORMAL_QUERY, (err, results) => {
+        });
+        con.query(INSERT_DIFFICULTY_HARD_QUERY, (err, results) => {
+        });
+        console.log("Table Difficulty Created and Populated");
+    });
+
+    var StatusTb = "CREATE TABLE if not exists status (id INT AUTO_INCREMENT PRIMARY KEY,  statusName VARCHAR(30) NOT NULL UNIQUE)";
+    con.query(StatusTb, function (err, result) {
+        if (err) throw err;
+        const INSERT_STATUS_INDEVELOPMENT_QUERY = `INSERT into status (statusName) VALUES('In Development')`;
+        const INSERT_STATUS_OPEN_QUERY = `INSERT into status (statusName) VALUES('Open')`;
+        const INSERT_STATUS_FULL_QUERY = `INSERT into status (statusName) VALUES('Full')`;
+        const INSERT_STATUS_CLOSED_QUERY = `INSERT into status (statusName) VALUES('Closed')`;
+        con.query(INSERT_STATUS_INDEVELOPMENT_QUERY, (err, results) => {
+        });
+        con.query(INSERT_STATUS_OPEN_QUERY, (err, results) => {
+        });
+        con.query(INSERT_STATUS_FULL_QUERY, (err, results) => {
+        });
+        con.query(INSERT_STATUS_CLOSED_QUERY, (err, results) => {
+        });
+        console.log("Table Status Created AND Populated");
+    });
 
 
-    var CompetitionsTb = "CREATE TABLE if not exists competitions (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL UNIQUE, maxParticipants INT(2) NOT NULL, status VARCHAR(15) NOT NULL, maxScore int(3), startDate DATETIME, endDate DATETIME, totalParticipants int(2))";
+    var CompetitionsTb = "CREATE TABLE if not exists competitions (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL UNIQUE, maxParticipants INT(2) NOT NULL, maxScore int(3), startDate DATETIME, endDate DATETIME, totalParticipants int(2), statusID INT(1) NOT NULL, FOREIGN KEY (statusID) references status(id))";
     con.query(CompetitionsTb, function (err, result) {
         if (err) throw err;
         console.log("Table Competitions Created");
@@ -481,7 +514,7 @@ con.connect(function (err) {
         console.log("Table SubClassification Created");
     });
 
-    var ChallengesTb = "CREATE TABLE if not exists challenges (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL UNIQUE, description VARCHAR(5000) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(100) NOT NULL, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (classificationID) REFERENCES classifications(id) )";
+    var ChallengesTb = "CREATE TABLE if not exists challenges (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL UNIQUE, description VARCHAR(5000) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(100) NOT NULL, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id) , FOREIGN KEY (classificationID) REFERENCES classifications(id))";
     con.query(ChallengesTb, function (err, result) {
         if (err) throw err;
         console.log("Table Challenges Created");
@@ -499,13 +532,13 @@ con.connect(function (err) {
         console.log("Table scorePerChallengePerCompetition Created");
     });
 
-    var QuestionsTb = "CREATE TABLE if not exists questions (id INT AUTO_INCREMENT PRIMARY KEY, classificationID INT NOT NULL, description VARCHAR(200) NOT NULL, answer1 VARCHAR(200), explanation1 VARCHAR(400), answer2 VARCHAR(200), explanation2 VARCHAR(400), answer3 VARCHAR(200), explanation3 VARCHAR(400), answer4 VARCHAR(200), explanation4 VARCHAR(400), correct VARCHAR(200) NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (classificationID) REFERENCES classifications(id))";
+    var QuestionsTb = "CREATE TABLE if not exists questions (id INT AUTO_INCREMENT PRIMARY KEY, classificationID INT NOT NULL, description VARCHAR(200) NOT NULL, answer1 VARCHAR(200), explanation1 VARCHAR(400), answer2 VARCHAR(200), explanation2 VARCHAR(400), answer3 VARCHAR(200), explanation3 VARCHAR(400), answer4 VARCHAR(200), explanation4 VARCHAR(400), correct VARCHAR(200) NOT NULL, FOREIGN KEY (classificationID) REFERENCES classifications(id))";
     con.query(QuestionsTb, function (err, result) {
         if (err) throw err;
         console.log("Table Questions Created");
     });
 
-    var QuizzTb = "CREATE TABLE if not exists quizzes (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(30), year INT(4) NOT NULL, numberQuestions INT(3))";
+    var QuizzTb = "CREATE TABLE if not exists quizzes (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(30), year INT(4) NOT NULL, numberQuestions INT(3), difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id))";
     con.query(QuizzTb, function (err, result) {
         if (err) throw err;
         console.log("Table Quizzes Created");
@@ -529,8 +562,6 @@ con.connect(function (err) {
         });
         con.query(INSERT_STATUS_DENIED_QUERY, (err, results) => {
         });
-
-
         console.log("Table SuggestionsStatus Created AND Populated");
     });
 
@@ -540,7 +571,7 @@ con.connect(function (err) {
         console.log("Table QuestionSuggestions Created");
     });
 
-    var ChallengeSuggestionsTb = "CREATE TABLE if not exists challengeSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL , name VARCHAR(100), description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(100) NOT NULL, solution VARCHAR(100) NOT NULL, difficulty INT(1) NOT NULL, FOREIGN KEY (userID) REFERENCES users(id), statusID INT(1) NOT NULL, FOREIGN KEY (statusID) REFERENCES suggestionsStatus(id))";
+    var ChallengeSuggestionsTb = "CREATE TABLE if not exists challengeSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL , name VARCHAR(100), description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(100) NOT NULL, solution VARCHAR(100) NOT NULL, difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id), FOREIGN KEY (userID) REFERENCES users(id), statusID INT(1) NOT NULL, FOREIGN KEY (statusID) REFERENCES suggestionsStatus(id))";
     con.query(ChallengeSuggestionsTb, function (err, result) {
         if (err) throw err;
         console.log("Table ChallengeSuggestions Created");
@@ -649,7 +680,7 @@ con.connect(function (err) {
 
     app.get('/api/getcompetitionByID/:id', (req, res) => {
         const id = req.params.id;
-        const SELECT_COMPETITIONBYID_QUERY = `SELECT * FROM competitions where id = ${id}`;
+        const SELECT_COMPETITIONBYID_QUERY = `SELECT c.id, c.name, c.maxParticipants, c.maxScore, DATE_FORMAT(c.startDate, '%d-%m-%y') startDate, DATE_FORMAT(c.endDate, '%d-%m-%y') endDate, c.totalParticipants, s.statusName FROM competitions c, status s where c.statusID = s.id and  c.id = ${id}`;
         con.query(SELECT_COMPETITIONBYID_QUERY, (err, results) => {
             if (err) {
                 console.log("ERRO ERRO");
@@ -666,7 +697,7 @@ con.connect(function (err) {
 
 
     //Get Competitions
-    const SELECT_ALL_COMPETITIONS_QUERY = `SELECT id, name, maxParticipants, status, maxScore, DATE_FORMAT(startDate, '%d-%m-%y') startDate, DATE_FORMAT(endDate, '%d-%m-%y') endDate, totalParticipants FROM competitions`;
+    const SELECT_ALL_COMPETITIONS_QUERY = `SELECT c.id, c.name, c.maxParticipants, c.maxScore, DATE_FORMAT(c.startDate, '%d-%m-%y') startDate, DATE_FORMAT(c.endDate, '%d-%m-%y') endDate, c.totalParticipants, s.statusName FROM competitions c, status s where c.statusID = s.id`;
 
     app.get('/api/competitions/View', (req, res) => {
         con.query(SELECT_ALL_COMPETITIONS_QUERY, (err, results) => {
@@ -684,9 +715,9 @@ con.connect(function (err) {
     //Add Competition
 
     app.post('/api/competitions/Add', (req, res) => {
-        const { name, maxParticipants, status, maxScore, startDate, endDate, totalParticipants } = req.body;
-        console.log(name, maxParticipants, status, maxScore, startDate, endDate, totalParticipants);
-        const INSERT_COMPETITION_QUERY = `INSERT INTO competitions (name, maxParticipants, status, maxScore, startDate, endDate, totalParticipants) VALUES('${name}', ${maxParticipants}, '${status}', ${maxScore}, STR_TO_DATE('${startDate}', '%d-%m-%Y'), STR_TO_DATE('${endDate}', '%d-%m-%Y'), ${totalParticipants} )`;
+        const { name, maxParticipants, maxScore, startDate, endDate, totalParticipants, statusID } = req.body;
+        console.log(name, maxParticipants, maxScore, startDate, endDate, totalParticipants, statusID);
+        const INSERT_COMPETITION_QUERY = `INSERT INTO competitions (name, maxParticipants, maxScore, startDate, endDate, totalParticipants, statusID ) VALUES('${name}', ${maxParticipants}, ${maxScore}, STR_TO_DATE('${startDate}', '%d-%m-%Y'), STR_TO_DATE('${endDate}', '%d-%m-%Y'), ${totalParticipants}, ${statusID} )`;
         con.query(INSERT_COMPETITION_QUERY, (err, results) => {
             if (err) {
                 return res.send(err)
@@ -718,7 +749,7 @@ con.connect(function (err) {
     // CHALLENGES METHODS -------------------------------------------------------------------------------------------------------------------------------------
 
     //Get Challenges
-    const SELECT_ALL_CHALLENGES_QUERY = 'SELECT * FROM challenges';
+    const SELECT_ALL_CHALLENGES_QUERY = 'SELECT c.id, c.name, c.description, c.link, c.mainFile, c.solution, cl.name classification, d.level FROM challenges c, classifications cl, difficulty d where c.classificationID = cl.id and c.difficultyID = d.id';
 
     app.get('/api/challenges/View', (req, res) => {
         con.query(SELECT_ALL_CHALLENGES_QUERY, (err, results) => {
@@ -738,7 +769,7 @@ con.connect(function (err) {
 
     app.get('/api/challengeById/:id', (req, res) => {
         const id = req.params.id;
-        const SELECT_CHALLENGEBYID_QUERY = `SELECT * FROM challenges where id = ${id}`;
+        const SELECT_CHALLENGEBYID_QUERY = `SELECT c.id, c.name, c.description, c.link, c.mainFile, c.solution, cl.name classification, d.level FROM challenges c, classifications cl, difficulty d where c.classificationID = cl.id and c.difficultyID = d.id and c.id = ${id}`;
         con.query(SELECT_CHALLENGEBYID_QUERY, (err, results) => {
             if (err) {
                 console.log("ERRO ERRO");
@@ -756,9 +787,9 @@ con.connect(function (err) {
     //Add Challenge
 
     app.post('/api/challenges/Add', (req, res) => {
-        const { name, description, link, mainFile, solution, classificationID, difficulty } = req.body;
-        console.log(name, description, link, mainFile, solution, classificationID, difficulty);
-        const INSERT_CHALLENGE_QUERY = `INSERT INTO challenges (name, description, link, mainFile, solution, classificationID, difficulty) VALUES('${name}', '${description}', '${link}', '${mainFile}', '${solution}' , ${classificationID}, ${difficulty} )`;
+        const { name, description, link, mainFile, solution, classificationID, difficultyID } = req.body;
+        console.log(name, description, link, mainFile, solution, classificationID, difficultyID);
+        const INSERT_CHALLENGE_QUERY = `INSERT INTO challenges (name, description, link, mainFile, solution, classificationID, difficultyID) VALUES('${name}', '${description}', '${link}', '${mainFile}', '${solution}' , ${classificationID}, ${difficultyID} )`;
         con.query(INSERT_CHALLENGE_QUERY, (err, results) => {
             if (err) {
                 return res.send(err)
@@ -793,7 +824,7 @@ con.connect(function (err) {
     //Get All Competition Challenges
     app.get('/api/challengesPerCompetition/getCompetitionChallenges/:competitionID', (req, res) => {
         const competitionID = req.params.competitionID;
-        const SELECT_ALL_COMPETITION_CHALLENGES_QUERY =`SELECT cpc.id, cpc.challengeID, cpc.challengeOrder, cpc.challengePoints, c.classificationID, cpc.competitionID, c.description, c.difficulty, c.link, c.mainFile, c.name  FROM challengesPerCompetition cpc, challenges c where cpc.competitionID = ${competitionID} and cpc.challengeID = c.id`;
+        const SELECT_ALL_COMPETITION_CHALLENGES_QUERY =`SELECT cpc.id, cpc.challengeID, cpc.challengeOrder, cpc.challengePoints, cl.name classification, cpc.competitionID, c.description, d.level, c.link, c.mainFile, c.name  FROM challengesPerCompetition cpc, challenges c, difficulty d, classifications cl where cpc.competitionID = ${competitionID} and cpc.challengeID = c.id and c.difficultyID = d.id and c.classificationID = cl.id`;
         con.query(SELECT_ALL_COMPETITION_CHALLENGES_QUERY, (err, results) =>{
             if(err){
                 return res.send(err);
@@ -1020,25 +1051,7 @@ con.connect(function (err) {
     })
 
 
-
-/*app.get('/api/scorePerChallengePerCompetition/checkChallengeDone/:challengePerCompetitionID/:registrationID', (err, res) =>{
-    const challengePerCompetitionID = req.params.challengePerCompetitionID;
-    const registrationID = req.params.registrationID;
-
-    const CHECK_CHALLENGE_IS_DONE__QUERY = `SELECT * from scorePerChallengePerCompetition where registrationID = ${registrationID} and challengesPerCompetitionID = ${challengePerCompetitionID}`
-    con.query(CHECK_CHALLENGE_IS_DONE__QUERY, (err, challengeDoneInfo) =>{
-        if(err){
-            return res.send(err);
-        }
-        else{
-            return res.json({
-                challengeDoneInfo: challengeDoneInfo
-            })  
-        }
-    })
-})*/
     
-
     app.get('/api/registrations/participantInfo/:competitionID/:userID', (req, res) =>{
         console.log(req.params);
         const competitionID = req.params.competitionID;
@@ -1307,9 +1320,9 @@ con.connect(function (err) {
     //Add question
 
     app.post('/api/questions/Add', (req, res) => {
-        const { classificationID, description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, difficulty } = req.body;
-        console.log(classificationID, description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, difficulty);
-        const INSERT_QUESTIONS_QUERY = `INSERT INTO questions (classificationID, description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, difficulty) VALUES(${classificationID}, '${description}', '${answer1}', '${explanation1}', '${answer2}', '${explanation2}', '${answer3}', '${explanation3}', '${answer4}', '${explanation4}', ${corret}, ${difficulty})`;
+        const { classificationID, description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, correct } = req.body;
+        console.log(classificationID, description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, correct);
+        const INSERT_QUESTIONS_QUERY = `INSERT INTO questions (classificationID, description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, correct) VALUES(${classificationID}, '${description}', '${answer1}', '${explanation1}', '${answer2}', '${explanation2}', '${answer3}', '${explanation3}', '${answer4}', '${explanation4}', ${correct}, ${difficulty})`;
         con.query(INSERT_QUESTIONS_QUERY, (err, res) => {
             if (err) {
                 return res.send(err)
@@ -1411,9 +1424,9 @@ con.connect(function (err) {
     //Add quizzes
 
     app.post('/api/quizzes/Add', (req, res) => {
-        const { name, year, numberQuestions } = req.body;
-        console.log(name, year, numberQuestions);
-        const INSERT_QUIZZES_QUERY = `INSERT INTO quizzQuestions (name, year, numberQuestions) VALUES('${name}', ${year}, ${numberQuestions})`;
+        const { name, year, numberQuestions, difficultyID } = req.body;
+        console.log(name, year, numberQuestions, difficultyID);
+        const INSERT_QUIZZES_QUERY = `INSERT INTO quizzQuestions (name, year, numberQuestions, difficultyID) VALUES('${name}', ${year}, ${numberQuestions}, ${difficultyID})`;
         con.query(INSERT_QUIZZES_QUERY, (err, res) => {
             if (err) {
                 return res.send(err)
@@ -1463,10 +1476,10 @@ con.connect(function (err) {
     //Add questionSuggestions
 
     app.post('/api/questionSuggestions/Add', (req, res) => {
-        const { description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, userID } = req.body;
+        const { description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, correct, userID } = req.body;
         const status = 1;
-        console.log(description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, userID);
-        const INSERT_QUESTIONSUGGESTIONS_QUERY = `INSERT INTO questionSuggestions (description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, corret, userID, status) VALUES( '${description}', '${answer1}', '${explanation1}', '${answer2}', '${explanation2}', '${answer3}', '${explanation3}', '${answer4}', '${explanation4}', ${corret}, ${userID}, ${status})`;
+        console.log(description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, correct, userID);
+        const INSERT_QUESTIONSUGGESTIONS_QUERY = `INSERT INTO questionSuggestions (description, answer1, explanation1, answer2, explanation2, answer3, explanation3, answer4, explanation4, correct, userID, status) VALUES( '${description}', '${answer1}', '${explanation1}', '${answer2}', '${explanation2}', '${answer3}', '${explanation3}', '${answer4}', '${explanation4}', ${correct}, ${userID}, ${status})`;
         con.query(INSERT_QUESTIONSUGGESTIONS_QUERY, (err, res) => {
             if (err) {
                 return res.send(err)
@@ -1533,9 +1546,9 @@ con.connect(function (err) {
                 const link = req.file.destination + folderName;
                 const mainFile = req.body.mainFile;
                 const solution = req.body.solution;
-                const difficulty = req.body.difficulty;
+                const difficultyID = req.body.difficultyID;
                 const statusID = 1;
-                const ADD_CHALLENGESUGGESTION_QUERY = `INSERT INTO challengeSuggestions (userID, name, description,  link, mainFile, solution, difficulty, statusID) VALUES( ${userID}, '${name}', '${description}', '${link}', '${mainFile}', '${solution}', ${difficulty}, ${statusID})`;
+                const ADD_CHALLENGESUGGESTION_QUERY = `INSERT INTO challengeSuggestions (userID, name, description,  link, mainFile, solution, difficultyID, statusID) VALUES( ${userID}, '${name}', '${description}', '${link}', '${mainFile}', '${solution}', ${difficultyID}, ${statusID})`;
                 con.query(ADD_CHALLENGESUGGESTION_QUERY, (err, results) => {
                     if (err) {
                         res.send(err);
@@ -1561,14 +1574,14 @@ con.connect(function (err) {
         const description = req.body.description;
         const mainFile = req.body.mainFile;
         const solution = req.body.solution;
-        const difficulty = req.body.difficulty;
+        const difficultyID = req.body.difficultyID;
         const link = req.body.link;
         const statusID = 2;
         const classificationID = req.body.classificationID;
         console.log(link);
         var fileName = link.substring(link.lastIndexOf('/'), link.length);
         var modifiedLink = '../challenges' +fileName+'/'+mainFile;
-        const ACCEPT_CHALLENGE_SUGGESTION_QUERY = `INSERT INTO challenges (name, description, link, mainFile, solution, classificationID, difficulty) VALUES('${name}', '${description}', '${modifiedLink}', '${mainFile}', '${solution}', ${classificationID}, ${difficulty}) `;
+        const ACCEPT_CHALLENGE_SUGGESTION_QUERY = `INSERT INTO challenges (name, description, link, mainFile, solution, classificationID, difficultyID) VALUES('${name}', '${description}', '${modifiedLink}', '${mainFile}', '${solution}', ${classificationID}, ${difficultyID}) `;
         con.query(ACCEPT_CHALLENGE_SUGGESTION_QUERY, (err, results) =>{
             if(err){
                 return res.send(err);

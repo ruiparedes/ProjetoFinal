@@ -1,0 +1,76 @@
+
+    #outer-div{
+        margin-top:2%;
+        margin-left:10%;
+        margin-right:10%;
+        background-color:#eee; 
+        padding-bottom: 2%;
+        border-style: solid;
+        border-width: 3px;
+        border-radius: 5px;
+    
+    }
+    #competitionNameDiv{
+    text-align: left;
+    margin-left: 2%;
+    padding-top: 1%;
+    }
+    #competitionStatusDiv{
+        text-align: left;
+        margin-left: 2%;
+    
+    }
+    #competitionScoreDiv{
+        text-align: left;
+        margin-left: 2%;
+    }
+    #challengeInfoDiv{
+        margin-top: 20px;
+        margin-left: auto;
+        margin-right: auto;
+        width:60%;
+        height: 50px;
+        border-style: solid;
+        border-width: 2px;
+        border-radius: 3px;
+        cursor: pointer;
+        background-color:#BEBEBE;
+    }
+    
+    #challengeNameDiv{
+        float: left;
+        width: 30%;
+        text-align: center;
+        margin-left:2%;
+        
+    }
+    #ScoreAndTimeDiv{
+        float: left;
+        margin-left:2%;
+        width: 20%;
+    }
+    #challengeScoreDiv{
+        float:left;
+        margin-left: 2%;
+        text-align: center;
+    
+    }
+    #challengeTimeDiv{
+    float:right;
+    margin-left: 2%;
+    text-align: center;
+        
+    }
+    #challengeDifficultyDiv{
+        float:left;
+        margin-left: 2%;
+        text-align: center;
+        width: 20%;
+    }
+    #challengeTypeDiv{
+        float:left;
+        margin-left: 2%;
+        text-align: center;
+        width: 20%;
+    }
+

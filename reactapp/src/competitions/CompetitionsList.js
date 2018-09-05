@@ -73,7 +73,6 @@ class CompetitionsList extends React.Component {
     }
 
     enterCompetition(competitionID){
-        console.log(competitionID);
         this.setState({competitionToEnter: competitionID, redirectToCompetitionChallenges: true});
 
     }
@@ -81,10 +80,7 @@ class CompetitionsList extends React.Component {
 
 
     render() {
-
         if(this.state.redirectToCompetitionChallenges == true) {
-            console.log(this.state.competitionToEnter);
-            console.log('A FAZER REDIRECT');
             this.setState({redirect: false});
             return <Redirect to={{
                 pathname: '/competitionChallenges',
@@ -93,13 +89,14 @@ class CompetitionsList extends React.Component {
         }
 
         return (
+            
             <div>
                 {this.state.competitions.map((competition, competitionIndex) => (
                     <div id="competitionBox" key={'competitionBox_' + competitionIndex}>
                         <div id="competitionName"><h2>{competition.name}</h2></div>
                         <div id="competitionParticipants"><h4>Participants: {competition.totalParticipants}/{competition.maxParticipants}</h4></div>
                         <div id="competitionDates"><h4>Competition Date: {competition.startDate} / {competition.endDate}</h4></div>
-                        <div id="competitionStatus"><h4>Status: {competition.status}</h4></div>
+                        <div id="competitionStatus"><h4>Status: {competition.statusName}</h4></div>
                         <div id="buttonDiv">
                             {this.isRegistered(competition) ? <button type="submit" value="EnterInCompetition" className="EnterInCompetitionButton" id="enterButton" onClick={() => {this.enterCompetition(competition.id)}}  >Entrar</button>
                                 : <button type="submit" value="RegisterInCompetition" className="RegisterInCompetitionButton" id="registerButton" onClick={() => {this.registerCompetition(competition.id)}} >Registar</button>}</div>

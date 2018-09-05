@@ -64,7 +64,7 @@ class CompetitionChallenges extends Component {
             })
     }
 
-    fetchChallengesDone() { 
+    fetchChallengesDone() {
         let userID = localUser.id;
         const getChallengesDone = URL + ':8080/api/scorePerChallengePerCompetition/challengesDone/' + this.props.location.state.competitionID + '/' + userID;
         console.log(URL + ':8080/api/scorePerChallengePerCompetition/challengesDone/' + this.props.location.state.competitionID + '/' + userID);
@@ -75,21 +75,24 @@ class CompetitionChallenges extends Component {
     }
 
     render() {
-        console.log(this.state.challengesDone); 
+        console.log(this.state.competitionChallenges);
         return (
-            <div>
-                <h1>{this.state.competitionInfo.name}</h1>
-                <h3>Pontuação: {this.state.participantInfo.finalScore}/{this.state.competitionInfo.maxScore}</h3>
+            <div id="outer-div">
+                <div id="competitionNameDiv"><h1>{this.state.competitionInfo.name}</h1></div>
+                <div id="competitionStatusDiv"><h2>Status: {this.state.competitionInfo.statusName}</h2></div>
+                <div id="competitionScoreDiv"><h3>Total Score: {this.state.participantInfo.finalScore}/{this.state.competitionInfo.maxScore}</h3></div>
                 {this.state.competitionChallenges.map((challenge, challengeIndex) => (
-                    <div>
-                        <div><p>{challenge.name}</p></div>
-                        <div>
-                        {this.state.challengesDone.length == 0 ? <div><div><p>Score: 0/{challenge.challengePoints}</p></div><div><p>Time: 0</p></div></div>
-                                : <div>{this.state.challengesDone.map((challengeDone, challengeDoneIndex) => (
-                                    <div> {challenge.id == challengeDone.id ? <div><div><p>Score: {challengeDone.score}/{challenge.challengePoints}</p></div> <div><p>Time: {challengeDone.time}</p></div></div>
-                                        : <div><div><p>Score: 0/{challenge.challengePoints}</p></div> <div><p>Time: 0</p></div></div>}</div>
-                                ))}</div>}
-                        </div>
+                    <div id="challengeInfoDiv">
+
+                        <div id="challengeNameDiv"><p>{challenge.name}</p></div>
+                        {this.state.challengesDone.length == 0 ? <div id="ScoreAndTimeDiv"><div id="challengeScoreDiv"><p>Score: 0/{challenge.challengePoints}</p></div><div id="challengeTimeDiv"><p>Time: 0</p></div></div>
+                            : <div>{this.state.challengesDone.map((challengeDone, challengeDoneIndex) => (
+                                <div> {challenge.id == challengeDone.id ? <div id="ScoreAndTimeDiv"><div id="challengeScoreDiv"><p>Score: {challengeDone.score}/{challenge.challengePoints}</p></div> <div id="challengeTimeDiv"><p>Time: {challengeDone.time}</p></div></div>
+                                    : <div id="ScoreAndTimeDiv"><div id="challengeScoreDiv"><p>Score: 0/{challenge.challengePoints}</p></div> <div id="challengeTimeDiv"><p>Time: 0</p></div></div>}</div>
+                            ))}</div>}
+
+                        <div id="challengeDifficultyDiv"><p>Difficulty: {challenge.level}</p></div>
+                        <div id="challengeTypeDiv"><p>Type: {challenge.classification}</p></div>
                     </div>
                 ))}
             </div>
