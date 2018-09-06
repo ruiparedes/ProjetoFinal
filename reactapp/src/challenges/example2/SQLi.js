@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { URL } from '../shared/Constants';
+import { URL } from '../../shared/Constants';
 import './SQLi.css';
 class SQLi extends React.Component {
 
@@ -16,14 +16,13 @@ class SQLi extends React.Component {
     }
 
     componentDidMount() {
-        let id = this.props.id;
-        const getChallenge = URL + ':8080/api/challengeById/' + id;
+        let challengeID = this.props.challengeID;
+        const getChallenge = URL + ':8080/api/challengeById/' + challengeID;
         fetch(getChallenge).then(res => res.json())
             .then(data => {
                 this.setState({ challenge: data.challenge[0] })
             })
     }
-
 
     onChange(e) {
         this.setState({ [e.target.className]: e.target.value });

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { URL } from '../shared/Constants';
+import { URL } from '../../shared/Constants';
 import './CSRF.css';
 import CSRFProcess from "./CSRFProcessing";
 import { BrowserRouter as Router, Route, Link, Switch, Redirect } from "react-router-dom";
@@ -20,8 +20,8 @@ class CSRF extends React.Component {
     }
 
     componentDidMount() {
-        let id = this.props.id;
-        const getChallenge = URL + ':8080/api/challengeById/'+ id;
+        let challengeID = this.props.challengeID;
+        const getChallenge = URL + ':8080/api/challengeById/'+ challengeID;
         fetch(getChallenge).then(res => res.json())
         .then(data => {
           this.setState({ challenge: data.challenge[0]})
@@ -71,7 +71,7 @@ class CSRF extends React.Component {
                     <button type="submit" value="Attack" className="attackButton" id="CSRFAttackButton" onClick={this.sendAttack}>Attack</button>
                 </div>
                 <div>
-                    <h4><b>URL de ataque:</b> {link}{this.state.parameters}</h4>
+                    <h4><b>Attack URL:</b> {link}{this.state.parameters}</h4>
                 </div>
                 </div>
             </div>

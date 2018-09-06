@@ -18,13 +18,12 @@ class AttackPage extends React.Component {
         console.log(type);
         console.log(name);
         const values = queryString.parse(this.props.location.search);
-        const myImportFunction = () => import('../challenges/' + type);
+        const myImportFunction = () => import('../challenges/example1/' + type);
         if(name !='') {
         const myImportFunction = () => import('../challenges/' + name);
         const Component = importedComponent(myImportFunction);
         return <Component id={id}  name={name} value={values}/>;
     }
-
         const Component = importedComponent(myImportFunction);
         return <Component id={id}  name={name} value={values}/>;
     }

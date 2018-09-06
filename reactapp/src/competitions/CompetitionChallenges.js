@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { URL } from '../shared/Constants';
 import './CompetitionChallenges.css';
+import { Route, Redirect } from 'react-router-dom';
 let localUser = JSON.parse(localStorage.getItem('userData'));
+
 
 class CompetitionChallenges extends Component {
 
@@ -13,13 +15,18 @@ class CompetitionChallenges extends Component {
             competitionID: '',
             challenges: [],
             competitionInfo: [],
-            participantInfo: []
+            participantInfo: [],
+            redirectToChallenge: false,
+            challengeToEnterID:'',
+            challengeToEnterLink:'',
+            challengeToEnterName:''
         }
         this.fetchCompetitionChallenges = this.fetchCompetitionChallenges.bind(this);
         this.fetchAllChallenges = this.fetchAllChallenges.bind(this);
         this.fetchCompetitionInfo = this.fetchCompetitionInfo.bind(this);
         this.fetchParticipantInfo = this.fetchParticipantInfo.bind(this);
         this.fetchChallengesDone = this.fetchChallengesDone.bind(this);
+        this.enterChallenge = this.enterChallenge.bind(this);
     }
 
 
@@ -74,7 +81,28 @@ class CompetitionChallenges extends Component {
             })
     }
 
+
+    enterChallenge(challengeID, challengeName, challengeLink){
+        this.setState({challengeToEnterID: challengeID});
+        this.setState({challengeToEnterName: challengeName});  
+        this.setState({challengeToEnterLink: challengeLink});        
+        this.setState({redirectToChallenge: true});
+    }
+
+
     render() {
+        if(this.state.redirectToChallenge==true){
+            this.setState({redirectToChallenge: false});
+            return <Redirect
+            to={{
+              pathname: "/challenge/" + this.state.challengeToEnterName,
+              state: {challengeID: this.state.challengeToEnterID, challengeLink: this.state.challengeToEnterLink, competitionID: this.props.location.state.competitionID}
+            }}
+          />  
+        }
+
+
+
         console.log(this.state.competitionChallenges);
         return (
             <div id="outer-div">
@@ -82,7 +110,7 @@ class CompetitionChallenges extends Component {
                 <div id="competitionStatusDiv"><h2>Status: {this.state.competitionInfo.statusName}</h2></div>
                 <div id="competitionScoreDiv"><h3>Total Score: {this.state.participantInfo.finalScore}/{this.state.competitionInfo.maxScore}</h3></div>
                 {this.state.competitionChallenges.map((challenge, challengeIndex) => (
-                    <div id="challengeInfoDiv">
+                    <div id="challengeInfoDiv" onClick = {() => {this.enterChallenge(challenge.challengeID, challenge.name, challenge.link)}}>
 
                         <div id="challengeNameDiv"><p>{challenge.name}</p></div>
                         {this.state.challengesDone.length == 0 ? <div id="ScoreAndTimeDiv"><div id="challengeScoreDiv"><p>Score: 0/{challenge.challengePoints}</p></div><div id="challengeTimeDiv"><p>Time: 0</p></div></div>

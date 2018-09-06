@@ -97,6 +97,34 @@ conVul.connect(function (err) {
 
     //Get Users
 
+    app.get('/api-vulnerable/CSRF/:amountAndReceptorAccount', (req, res) =>{
+        const moneyToTransfer = req.params.amountAndReceptorAccount;
+        if(moneyToTransfer.substring(1, 6) =='amount'){
+            var amount = moneyToTransfer.substring(8, 12);
+            var receptorAccount = moneyToTransfer.substring(27, moneyToTransfer.length);
+        }
+        else{
+            var receptorAccount = moneyToTransfer.substring(17, 20);
+            var amount = moneyToTransfer.substring(28, moneyToTransfer.length);
+        }
+
+        console.log(amount);
+        console.log(receptorAccount);
+        if(receptorAccount ==7432 && amount ==1000){
+            return res.send({
+                "code": 200,
+                "success": "The CSRF Attack was executed successfully!"
+            }); 
+        }
+        else{
+           return res.send({
+                "code": 405,
+                "success": "The CSRF Attack failed!"
+            });
+        }
+
+    })
+
 
     app.get('/api-vulnerable/users/View', (req, res) => {
         const SELECT_ALL_USERS_QUERY = 'SELECT * FROM users';
@@ -282,7 +310,6 @@ function checkCompetitionDate() {
 async function doLoopThroughCompetitions(competitions) {
     for (var i in competitions) {
         if ((competitions[i].endDate <= Date.now()) && competitions[i].statusID == 2) {
-            console.log('Competição ' + competitions[i].name + ' fechada');
             await closeCompetition(competitions[i].id);
         }
     }
@@ -338,7 +365,6 @@ function checkCompetitionChallenges(competitionID) {
                 reject(err);
             }
             else {
-                console.log(competitionChallenges);
                 resolve(competitionChallenges);
             }
         })
@@ -354,7 +380,6 @@ function checkAllParticipants(competitionID) {
                 reject(err);
             }
             else {
-                console.log(participants);
                 resolve(participants);
             }
         })
@@ -378,17 +403,14 @@ async function doLoopThroughParticipantsAndChallenges(participants, challenges, 
                 createScoreboard(participants[participant].id, competitionToClose, finalParticipantScore, finalParticipantTime);
             });
         }
-        console.log('Processou tudo participante:' + participants[participant].id);
     }
     checkParticipantsPlaces(competitionToClose).then(function (participantsOrderBy) {
         var pos = 1;
         for (var rank in participantsOrderBy) {
-            console.log(rank)
             insertParticipantPlace(participantsOrderBy[rank].id, pos);
             pos++;
         }
     })
-    console.log('Chegou ao fim do processo para a competição:' + competitionToClose);
 }
 
 function insertParticipantPlace(participantID, place) {
@@ -399,7 +421,6 @@ function insertParticipantPlace(participantID, place) {
                 reject(err);
             }
             else {
-                console.log('Posição adicionada ao participant: ' + participantID + ' lugar: ' + place);
                 resolve(updatedParticipantPlace);
             }
         })
@@ -414,7 +435,6 @@ function checkParticipantScoreChallenge(participantID, challengeID) {
                 console.log(err);
             }
             else {
-                console.log('Score do participante:' + participantID + ' na challenge:' + challengeID);
                 resolve(participantScoreOnChallenge);
             }
         })
@@ -432,7 +452,6 @@ function createScoreboard(participantID, competitionID, totalScore, totalTime) {
                 reject(err);
             }
             else {
-                console.log('UPDATE REALIZADO À PONTUAÇÃO DO JOGADOR:' + participantID + 'na competição: ' + competitionID + 'adicionando: ' + totalScore + ' pontos' + ' num tempo de ' + totalTime);
             }
         })
     })
@@ -687,7 +706,6 @@ con.connect(function (err) {
                 return res.send(err)
             }
             else {
-                console.log(results);
                 return res.json({
                     competition: results[0]
                 })
@@ -732,7 +750,6 @@ con.connect(function (err) {
 
     app.post('/api/competitions/Delete', (req, res) => {
         const id = req.body.id;
-        console.log(req.body);
         const DELETE_COMPETITION_QUERY = `DELETE FROM competitions WHERE id = ${id}`;
         con.query(DELETE_COMPETITION_QUERY, (err, results) => {
             if (err) {
@@ -804,7 +821,6 @@ con.connect(function (err) {
 
     app.post('/api/challenges/Delete', (req, res) => {
         const id = req.body.id;
-        console.log(req.body);
         const DELETE_CHALLENGE_QUERY = `DELETE FROM challenges WHERE id = ${id}`;
         con.query(DELETE_CHALLENGE_QUERY, (err, results) => {
             if (err) {
@@ -830,8 +846,6 @@ con.connect(function (err) {
                 return res.send(err);
             }
             else{
-                console.log('Challenges da Competição')
-                console.log(results);
                 return res.json({
                     competitionChallenges: results
                 })
@@ -876,7 +890,6 @@ con.connect(function (err) {
 
     app.post('/api/challengesPerCompetition/Delete', (req, res) => {
         const id = req.body.id;
-        console.log(req.body);
         const DELETE_CHALLENGEPERCOMPETITION_QUERY = `DELETE FROM challengesPerCompetition WHERE id = ${id}`;
         con.query(DELETE_CHALLENGEPERCOMPETITION_QUERY, (err, results) => {
             if (err) {
@@ -911,7 +924,6 @@ con.connect(function (err) {
     //Get User Registrations
     app.get('/api/userRegistrations/:userID', (req, res) => {
         const userID = req.params.userID;
-        console.log(userID);
         const SELECT_USERREGISTRATIONS_QUERY = `SELECT competitionID FROM registrations where userID = ${userID}`;
         con.query(SELECT_USERREGISTRATIONS_QUERY, (err, results) => {
             if (err) {
@@ -919,7 +931,6 @@ con.connect(function (err) {
                 return res.send(err)
             }
             else {
-                console.log(results);
                 return res.json({
                     registrations: results
                 })
@@ -938,9 +949,7 @@ con.connect(function (err) {
                 return res.send(err);
             }
             else{
-                console.log(competitionInfo);
                 if(competitionInfo[0].totalParticipants < competitionInfo[0].maxParticipants){
-                    console.log('The participant can register himself');
                     const finalScore = 0;
                     const finalTime = 0;
                     const registrationDate = moment().format('DD-MM-YYYY');
@@ -985,7 +994,6 @@ con.connect(function (err) {
 
     app.post('/api/registrations/Delete', (req, res) => {
         const id = req.body.id;
-        console.log(req.body);
         const DELETE_REGISTRATION_QUERY = `DELETE FROM registrations WHERE id = ${id}`;
         con.query(DELETE_REGISTRATION_QUERY, (err, results) => {
             if (err) {
@@ -1011,7 +1019,6 @@ con.connect(function (err) {
                 return res.send(err);
             }
             else{
-                console.log(participantInfo[0].id);
                 participantID = participantInfo[0].id;
                 const GET_COMPETITION_CHALLENGES_ID_QUERY = `SELECT id from challengesPerCompetition where competitionID =${competitionID}`;
                 var challenges = [];
@@ -1020,11 +1027,9 @@ con.connect(function (err) {
                         return res.send(err);
                     }
                     else{
-                        console.log(competitionChallenges)
                         for(var i in competitionChallenges){
                             challenges[i] = competitionChallenges[i].id;
                         }
-                        console.log(challenges);
         
                         const GET_CHALLENGES_DONE = `SELECT * FROM scorePerChallengePerCompetition where registrationID = ${participantID} and id IN (${challenges.join()})`;
                         con.query(GET_CHALLENGES_DONE, (err, challengesDone) =>{
@@ -1032,7 +1037,6 @@ con.connect(function (err) {
                                 return res.send(err);
                             }
                             else{
-                                console.log(challengesDone);
                                 return res.json({
                                     challengesDone: challengesDone
                                 })  
@@ -1053,19 +1057,14 @@ con.connect(function (err) {
 
     
     app.get('/api/registrations/participantInfo/:competitionID/:userID', (req, res) =>{
-        console.log(req.params);
         const competitionID = req.params.competitionID;
         const userID = req.params.userID;
-        console.log(competitionID);
-        console.log(userID);
         const GET_PARTICIPANT_ID_QUERY = `SELECT id from registrations where userID = ${userID} and competitionID = ${competitionID}`;
         con.query(GET_PARTICIPANT_ID_QUERY, (err, participantInfo) =>{
             if(err){
                 return res.send(err);
             }
             else{
-                console.log('PARTICIPANT ID: ');
-                console.log(participantInfo[0].id);
                 let participantID = participantInfo[0].id;
                 const SELECT_PARTICIPANT_TOTAL_SCORE_QUERY = `SELECT * from registrations where id = ${participantID}`;
                 con.query(SELECT_PARTICIPANT_TOTAL_SCORE_QUERY, (err, particiapantInfo) =>{
@@ -1121,7 +1120,6 @@ con.connect(function (err) {
 
     app.post('/api/scorePerChallengePerCompetition/Delete', (req, res) => {
         const id = req.body.id;
-        console.log(req.body);
         const DELETE_SCOREPERCHALLENGEPERCOMPETITION_QUERY = `DELETE FROM scorePerChallengePerCompetition WHERE id = ${id}`;
         con.query(DELETE_SCOREPERCHALLENGEPERCOMPETITION_QUERY, (err, results) => {
             if (err) {
@@ -1148,8 +1146,6 @@ con.connect(function (err) {
             else {
                 const challengeScore = results[0].challengePoints;
                 const competitionChallengeID = results[0].id;
-                console.log(challengeScore);
-                console.log(competitionChallengeID);
 
                 const SELECT_COMPETITION_QUERY = `SELECT * from competitions where id = ${competitionID}`;
                 con.query(SELECT_COMPETITION_QUERY, (err, competitionInfo) => {
@@ -1158,9 +1154,7 @@ con.connect(function (err) {
                     }
                     else {
                         const competitionStartDate = competitionInfo[0].startDate;
-                        console.log(competitionStartDate);
                         var time = Date.now() - competitionStartDate;
-                        console.log(time);
 
                         const SELECT_PARTICIPANT_ID = `SELECT id from registrations where userID = ${userID} and competitionID = ${competitionID}`;
                         con.query(SELECT_PARTICIPANT_ID, (err, participantInfo) => {
@@ -1216,7 +1210,6 @@ con.connect(function (err) {
 
     app.post('/api/classifications/Add', (req, res) => {
         const { name } = req.body;
-        console.log(name);
         const INSERT_CLASSIFICATION_QUERY = `INSERT INTO classifications (name) VALUES('${name}')`;
         con.query(INSERT_CLASSIFICATION_QUERY, (err, results) => {
             if (err) {
@@ -1232,7 +1225,6 @@ con.connect(function (err) {
 
     app.post('/api/classifications/Delete', (req, res) => {
         const id = req.body.id;
-        console.log(req.body);
         const DELETE_SCOREPERCHALLENGEPERCOMPETITION_QUERY = `DELETE FROM classifications WHERE id = ${id}`;
         con.query(DELETE_SCOREPERCHALLENGEPERCOMPETITION_QUERY, (err, results) => {
             if (err) {
@@ -1268,7 +1260,6 @@ con.connect(function (err) {
 
     app.post('/api/subClassifications/Add', (req, res) => {
         const { classificationID, name } = req.body;
-        console.log(classificationID, name);
         const INSERT_SUBCLASSIFICATION_QUERY = `INSERT INTO subClassifications (classificationID, name) VALUES(${classificationID}, '${name}')`;
         con.query(INSERT_SUBCLASSIFICATION_QUERY, (err, results) => {
             if (err) {
@@ -1284,7 +1275,6 @@ con.connect(function (err) {
 
     app.post('/api/subClassifications/Delete', (req, res) => {
         const id = req.body.id;
-        console.log(req.body);
         const DELETE_SUBCLASSIFICATION_QUERY = `DELETE FROM subClassifications WHERE id = ${id}`;
         con.query(DELETE_SUBCLASSIFICATION_QUERY, (err, results) => {
             if (err) {
@@ -1337,7 +1327,6 @@ con.connect(function (err) {
 
     app.post('/api/questions/Delete', (req, res) => {
         const id = req.body.id;
-        console.log(req.body);
         const DELETE_QUESTIONS_QUERY = `DELETE FROM questions WHERE id = ${id}`;
         con.query(DELETE_QUESTIONS_QUERY, (err, res) => {
             if (err) {
