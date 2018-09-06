@@ -97,30 +97,24 @@ conVul.connect(function (err) {
 
     //Get Users
 
-    app.get('/api-vulnerable/CSRF/:amountAndReceptorAccount', (req, res) =>{
-        const moneyToTransfer = req.params.amountAndReceptorAccount;
-        if(moneyToTransfer.substring(1, 6) =='amount'){
-            var amount = moneyToTransfer.substring(8, 12);
-            var receptorAccount = moneyToTransfer.substring(27, moneyToTransfer.length);
-        }
-        else{
-            var receptorAccount = moneyToTransfer.substring(17, 20);
-            var amount = moneyToTransfer.substring(28, moneyToTransfer.length);
-        }
-
+    app.get('/api-vulnerable/CSRF/:amount/:receptorAccount', (req, res) =>{
+        
+        var amount = req.params.amount;
+        var receptorAccount = req.params.receptorAccount;
         console.log(amount);
         console.log(receptorAccount);
-        if(receptorAccount ==7432 && amount ==1000){
-            return res.send({
-                "code": 200,
-                "success": "The CSRF Attack was executed successfully!"
-            }); 
+
+        if(receptorAccount == 7432 && amount == 1000){
+            console.log("The CSRF Attack was executed successfully!");
+            return res.status(200).json({
+                message: 'Attack was successful!'
+            }) 
         }
         else{
-           return res.send({
-                "code": 405,
-                "success": "The CSRF Attack failed!"
-            });
+            console.log("The CSRF Attack failed");
+            return res.status(400).json({
+                message: 'Attack failed!'
+            })  
         }
 
     })
@@ -1156,23 +1150,34 @@ con.connect(function (err) {
                         const competitionStartDate = competitionInfo[0].startDate;
                         var time = Date.now() - competitionStartDate;
 
-                        const SELECT_PARTICIPANT_ID = `SELECT id from registrations where userID = ${userID} and competitionID = ${competitionID}`;
+                        const SELECT_PARTICIPANT_ID = `SELECT * from registrations where userID = ${userID} and competitionID = ${competitionID}`;
                         con.query(SELECT_PARTICIPANT_ID, (err, participantInfo) => {
                             if (err) {
                                 return res.send(err);
                             }
                             else {
-                                registrationID = participantInfo[0].id;
+                                var registrationID = participantInfo[0].id;
+                                var participantFinalScore = participantInfo[0].finalScore;
                                 const ADD_SCORE_PARTICIPANT_QUERY = `INSERT INTO scorePerChallengePerCompetition (registrationID, challengesPerCompetitionID, score, time) VALUES(${registrationID}, ${competitionChallengeID}, ${challengeScore}, ${time})`;
                                 con.query(ADD_SCORE_PARTICIPANT_QUERY, (err, insertedInfo) => {
                                     if (err) {
                                         return res.send(err);
                                     }
                                     else {
-                                        res.send({
-                                            "code": 200,
-                                            "success": "Added Score to Participant"
-                                        });
+                                        participantFinalScore = participantFinalScore + challengeScore;
+                                        console.log(participantFinalScore);
+                                       const UPDATE_PARTICIPANT_TOTAL_SCORE = `UPDATE registrations SET finalScore = ${participantFinalScore} where id=${registrationID}`;
+                                       con.query(UPDATE_PARTICIPANT_TOTAL_SCORE, (err, updatedParticipantFinalScore) =>{
+                                        if (err) {
+                                            return res.send(err);
+                                        }
+                                        else{
+                                            return res.status(200).json({
+                                                message: 'Points were added to the Participant!'
+                                            }) 
+                                        }
+                                       })
+                                       
                                     }
                                 })
                             }

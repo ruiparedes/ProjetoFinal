@@ -3,6 +3,8 @@ import { URL } from '../../shared/Constants';
 import './CSRF.css';
 import CSRFProcess from "./CSRFProcessing";
 import { BrowserRouter as Router, Route, Link, Switch, Redirect } from "react-router-dom";
+import Notifications, {notify} from 'react-notify-toast';
+let localUser = JSON.parse(localStorage.getItem('userData'));
 
 class CSRF extends React.Component {
 
@@ -35,30 +37,59 @@ class CSRF extends React.Component {
     }
 
     sendAttack() {
-
-        if (this.state.CSRFAttack) {
-            this.setState({ redirect: true });
+        const amountAndReceptorAccount = this.state.parameters;
+        if(amountAndReceptorAccount.substr(1, 6) =='amount' && amountAndReceptorAccount.substr(13, 15)=='receptorAccount'){
+            var amount = amountAndReceptorAccount.substr(8, 4);
+            var receptorAccount = amountAndReceptorAccount.substr(29, 4);
         }
+        else if(amountAndReceptorAccount.substr(1, 15)=='receptorAccount' && amountAndReceptorAccount.substr(22, 6)=='amount'){
+            var receptorAccount = amountAndReceptorAccount.substr(17, 4);
+            var amount = amountAndReceptorAccount.substr(29, 4);
+        }
+        else{
+            notify.show('Your attack failed. Check everything so see if somethings wrong!');
+        }
+
+        const checkAttack = URL + ':8080/api-vulnerable/CSRF/'+amount+'/'+receptorAccount;
+
+        fetch(checkAttack).then((object) =>{
+            console.log(object);
+                console.log(object.status);
+            if(object.status ==200){
+                notify.show('Congratulations, your attack was a success!!');
+
+                var challengeID = this.props.challengeID;
+                var competitionID = this.props.competitionID;
+                var userID = localUser.id;
+
+                console.log(challengeID);
+                console.log(competitionID);
+                console.log(userID);
+
+                fetch(URL + ':8080/api/scorePerChallengePerCompetition/getScore', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        challengeID: challengeID,
+                        competitionID: competitionID,
+                        userID: userID
+                    }),
+                    headers: new Headers({
+                        'Content-Type': 'application/json'
+                    })
+                });
+
+            }
+            else {
+                notify.show('Your attack failed. Check everything so see if somethings wrong!');
+            }
+        })
 
     }
 
 
     render() {
-        const link = "http://localhost:3000/attack/CSRFProcessing"
+        const link = "http://RichPeopleBank/YourAccount/TransferMoney"
 
-        if (this.state.redirect == true) {
-            console.log(this.state.redirect);
-            this.setState({ redirect: false });
-            console.log(this.state.redirect);
-            console.log("Link:" + this.state.CSRFAttack);
-            return <Redirect to={{
-                pathname: '/attack/CSRFProcessing',
-                search: this.state.CSRFAttack,
-            }} />
-
-
-
-        }
 
         return (
             <div>
@@ -74,6 +105,7 @@ class CSRF extends React.Component {
                     <h4><b>Attack URL:</b> {link}{this.state.parameters}</h4>
                 </div>
                 </div>
+                <div><Notifications /></div>
             </div>
         );
     }
