@@ -14,6 +14,7 @@ import CompetitionsList from "./competitions/CompetitionsList";
 import CompetitionChallenges from "./competitions/CompetitionChallenges";
 import ChallengeSuggestion from "./suggestions/ChallengeSuggestion";
 import Challenge from "./competitions/Challenge";
+import Leaderboard from "./competitions/Leaderboard";
 
 class App extends React.Component {
   render() {
@@ -34,6 +35,7 @@ class App extends React.Component {
                 <Route exact path="/challengeSuggestion" component={ChallengeSuggestion} />
                 <Route exact path="/competitionChallenges" component={CompetitionChallenges} />
                 <Route exact path="/challenge/:name/" component={Challenge} />
+                <Route exact path="/leaderboard" component={Leaderboard} />
                 </Switch>
               </div>
           </div>

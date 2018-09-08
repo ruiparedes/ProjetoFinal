@@ -97,24 +97,24 @@ conVul.connect(function (err) {
 
     //Get Users
 
-    app.get('/api-vulnerable/CSRF/:amount/:receptorAccount', (req, res) =>{
-        
+    app.get('/api-vulnerable/CSRF/:amount/:receptorAccount', (req, res) => {
+
         var amount = req.params.amount;
         var receptorAccount = req.params.receptorAccount;
         console.log(amount);
         console.log(receptorAccount);
 
-        if(receptorAccount == 7432 && amount == 1000){
+        if (receptorAccount == 7432 && amount == 1000) {
             console.log("The CSRF Attack was executed successfully!");
             return res.status(200).json({
                 message: 'Attack was successful!'
-            }) 
+            })
         }
-        else{
+        else {
             console.log("The CSRF Attack failed");
             return res.status(400).json({
                 message: 'Attack failed!'
-            })  
+            })
         }
 
     })
@@ -392,6 +392,16 @@ async function doLoopThroughParticipantsAndChallenges(participants, challenges, 
                     finalParticipantScore += participantScoreOnChallenge[0].score;
                     if (finalParticipantTime < participantScoreOnChallenge[0].time) {
                         finalParticipantTime = participantScoreOnChallenge[0].time;
+                        var ms = finalParticipantTime;
+                        var days, hours, mnts, seconds;
+                        seconds = Math.floor(ms / 1000);
+                        mnts = Math.floor(seconds / 60);
+                        seconds = seconds % 60;
+                        hours = Math.floor(mnts / 60);
+                        mnts = mnts % 60;
+                        days = Math.floor(hours / 24);
+                        hours = hours % 24;
+                        console.log(days + " days, " + hours + " Hrs, " + mnts + " Minutes, " + seconds + " Seconds");
                     }
                 }
                 createScoreboard(participants[participant].id, competitionToClose, finalParticipantScore, finalParticipantTime);
@@ -471,7 +481,7 @@ con.connect(function (err) {
     var DifficultyTb = "CREATE TABLE if not exists difficulty (id INT AUTO_INCREMENT PRIMARY KEY, level VARCHAR(20) NOT NULL UNIQUE)";
     con.query(DifficultyTb, function (err, result) {
         if (err) throw err;
-        
+
         const INSERT_DIFFICULTY_EASY_QUERY = `INSERT into difficulty (level) VALUES('Easy')`;
         const INSERT_DIFFICULTY_NORMAL_QUERY = `INSERT into difficulty (level) VALUES('Normal')`;
         const INSERT_DIFFICULTY_HARD_QUERY = `INSERT into difficulty (level) VALUES('Hard')`;
@@ -834,19 +844,19 @@ con.connect(function (err) {
     //Get All Competition Challenges
     app.get('/api/challengesPerCompetition/getCompetitionChallenges/:competitionID', (req, res) => {
         const competitionID = req.params.competitionID;
-        const SELECT_ALL_COMPETITION_CHALLENGES_QUERY =`SELECT cpc.id, cpc.challengeID, cpc.challengeOrder, cpc.challengePoints, cl.name classification, cpc.competitionID, c.description, d.level, c.link, c.mainFile, c.name  FROM challengesPerCompetition cpc, challenges c, difficulty d, classifications cl where cpc.competitionID = ${competitionID} and cpc.challengeID = c.id and c.difficultyID = d.id and c.classificationID = cl.id`;
-        con.query(SELECT_ALL_COMPETITION_CHALLENGES_QUERY, (err, results) =>{
-            if(err){
+        const SELECT_ALL_COMPETITION_CHALLENGES_QUERY = `SELECT cpc.id, cpc.challengeID, cpc.challengeOrder, cpc.challengePoints, cl.name classification, cpc.competitionID, c.description, d.level, c.link, c.mainFile, c.name  FROM challengesPerCompetition cpc, challenges c, difficulty d, classifications cl where cpc.competitionID = ${competitionID} and cpc.challengeID = c.id and c.difficultyID = d.id and c.classificationID = cl.id`;
+        con.query(SELECT_ALL_COMPETITION_CHALLENGES_QUERY, (err, results) => {
+            if (err) {
                 return res.send(err);
             }
-            else{
+            else {
                 return res.json({
                     competitionChallenges: results
                 })
             }
         })
     })
-    
+
 
     //Get challengesPerCompetition
     const SELECT_ALL_CHALLENGESPERCOMPETITION_QUERY = 'SELECT * FROM challengesPerCompetition';
@@ -899,6 +909,29 @@ con.connect(function (err) {
 
     // REGISTRATIONS METHODS -------------------------------------------------------------------------------------------------------------------------------------
 
+    //GetAllCompetitionRegistrations
+
+
+
+    app.get('/api/registrations/getCompetitionRegistrations/:competitionID', (req, res) => {
+        const competitionID = req.params.competitionID;
+        const SELECT_ALL_COMPETITION_REGISTRATIONS = `SELECT r.id, u.username, r.competitionID, r.finalScore, r.finalTime, r.place, r.registrationDate FROM registrations r, users u WHERE r.competitionID = ${competitionID} and r.userID = u.id ORDER BY place`;
+
+        con.query(SELECT_ALL_COMPETITION_REGISTRATIONS, (err, compRegistrations) => {
+            if (err) {
+                return res.send(err);
+            }
+            else {
+                return res.json({
+                    registrations: compRegistrations
+                })
+            }
+        })
+
+
+    })
+
+
     //Get REGISTRATIONS
     const SELECT_ALL_REGISTRATIONS_QUERY = `SELECT id, userID, competitionID, finalScore, finalTime, DATE_FORMAT(registrationDate, '%d-%m-%y') FROM registrations`;
 
@@ -938,12 +971,12 @@ con.connect(function (err) {
         const userID = req.body.userID;
         const competitionID = req.body.competitionID;
         const CHECK_COMPETITION_NUMBER_PARTICIPANTS_QUERY = `SELECT * FROM competitions where id = ${competitionID}`;
-        con.query(CHECK_COMPETITION_NUMBER_PARTICIPANTS_QUERY, (err, competitionInfo) =>{
-            if(err){
+        con.query(CHECK_COMPETITION_NUMBER_PARTICIPANTS_QUERY, (err, competitionInfo) => {
+            if (err) {
                 return res.send(err);
             }
-            else{
-                if(competitionInfo[0].totalParticipants < competitionInfo[0].maxParticipants){
+            else {
+                if (competitionInfo[0].totalParticipants < competitionInfo[0].maxParticipants) {
                     const finalScore = 0;
                     const finalTime = 0;
                     const registrationDate = moment().format('DD-MM-YYYY');
@@ -955,14 +988,14 @@ con.connect(function (err) {
                         }
                         else {
                             var competitionParticipants = competitionInfo[0].totalParticipants;
-                            competitionParticipants +=1;
+                            competitionParticipants += 1;
                             console.log('Updating Competition Number of participants');
                             const UPDATE_NUMBER_PARTICIPANTS_COMPETITION_QUERY = `UPDATE competitions SET totalParticipants = ${competitionParticipants} where id = ${competitionID}`;
-                            con.query(UPDATE_NUMBER_PARTICIPANTS_COMPETITION_QUERY, (err, competitionUpdatedInfo) =>{
-                                if(err){
+                            con.query(UPDATE_NUMBER_PARTICIPANTS_COMPETITION_QUERY, (err, competitionUpdatedInfo) => {
+                                if (err) {
                                     return res.send(err);
                                 }
-                                else{
+                                else {
                                     console.log('Competition number of participants updated successfully');
                                     return res.send({
                                         "code": 200,
@@ -973,7 +1006,7 @@ con.connect(function (err) {
                         }
                     });
                 }
-                else{
+                else {
                     return res.send({
                         "code": 405,
                         "error": "The competition is already full!"
@@ -981,7 +1014,7 @@ con.connect(function (err) {
                 }
             }
         })
-        
+
     });
 
     //Delete REGISTRATIONS
@@ -1003,40 +1036,40 @@ con.connect(function (err) {
 
     // scorePerChallengePerCompetition METHODS -------------------------------------------------------------------------------------------------------------------------------------
 
-    app.get('/api/scorePerChallengePerCompetition/challengesDone/:competitionID/:userID', (req, res) =>{
+    app.get('/api/scorePerChallengePerCompetition/challengesDone/:competitionID/:userID', (req, res) => {
         const competitionID = req.params.competitionID;
         const userID = req.params.userID;
 
         const GET_PARTICIPANT_ID_QUERY = `SELECT id from registrations where userID = ${userID} and competitionID = ${competitionID}`;
-        con.query(GET_PARTICIPANT_ID_QUERY, (err, participantInfo) =>{
-            if(err){
+        con.query(GET_PARTICIPANT_ID_QUERY, (err, participantInfo) => {
+            if (err) {
                 return res.send(err);
             }
-            else{
+            else {
                 participantID = participantInfo[0].id;
                 const GET_COMPETITION_CHALLENGES_ID_QUERY = `SELECT id from challengesPerCompetition where competitionID =${competitionID}`;
                 var challenges = [];
-                con.query(GET_COMPETITION_CHALLENGES_ID_QUERY, (err, competitionChallenges) =>{
-                    if(err){
+                con.query(GET_COMPETITION_CHALLENGES_ID_QUERY, (err, competitionChallenges) => {
+                    if (err) {
                         return res.send(err);
                     }
-                    else{
-                        for(var i in competitionChallenges){
+                    else {
+                        for (var i in competitionChallenges) {
                             challenges[i] = competitionChallenges[i].id;
                         }
-        
+
                         const GET_CHALLENGES_DONE = `SELECT * FROM scorePerChallengePerCompetition where registrationID = ${participantID} and id IN (${challenges.join()})`;
-                        con.query(GET_CHALLENGES_DONE, (err, challengesDone) =>{
-                            if(err){
+                        con.query(GET_CHALLENGES_DONE, (err, challengesDone) => {
+                            if (err) {
                                 return res.send(err);
                             }
-                            else{
+                            else {
                                 return res.json({
                                     challengesDone: challengesDone
-                                })  
+                                })
                             }
                         })
-        
+
                     }
                 })
 
@@ -1045,27 +1078,27 @@ con.connect(function (err) {
         })
 
 
-        
+
     })
 
 
-    
-    app.get('/api/registrations/participantInfo/:competitionID/:userID', (req, res) =>{
+
+    app.get('/api/registrations/participantInfo/:competitionID/:userID', (req, res) => {
         const competitionID = req.params.competitionID;
         const userID = req.params.userID;
         const GET_PARTICIPANT_ID_QUERY = `SELECT id from registrations where userID = ${userID} and competitionID = ${competitionID}`;
-        con.query(GET_PARTICIPANT_ID_QUERY, (err, participantInfo) =>{
-            if(err){
+        con.query(GET_PARTICIPANT_ID_QUERY, (err, participantInfo) => {
+            if (err) {
                 return res.send(err);
             }
-            else{
+            else {
                 let participantID = participantInfo[0].id;
                 const SELECT_PARTICIPANT_TOTAL_SCORE_QUERY = `SELECT * from registrations where id = ${participantID}`;
-                con.query(SELECT_PARTICIPANT_TOTAL_SCORE_QUERY, (err, particiapantInfo) =>{
-                    if(err) {
+                con.query(SELECT_PARTICIPANT_TOTAL_SCORE_QUERY, (err, particiapantInfo) => {
+                    if (err) {
                         return res.send(err);
                     }
-                    else{
+                    else {
                         return res.json({
                             participantInfo: particiapantInfo[0]
                         })
@@ -1166,18 +1199,18 @@ con.connect(function (err) {
                                     else {
                                         participantFinalScore = participantFinalScore + challengeScore;
                                         console.log(participantFinalScore);
-                                       const UPDATE_PARTICIPANT_TOTAL_SCORE = `UPDATE registrations SET finalScore = ${participantFinalScore} where id=${registrationID}`;
-                                       con.query(UPDATE_PARTICIPANT_TOTAL_SCORE, (err, updatedParticipantFinalScore) =>{
-                                        if (err) {
-                                            return res.send(err);
-                                        }
-                                        else{
-                                            return res.status(200).json({
-                                                message: 'Points were added to the Participant!'
-                                            }) 
-                                        }
-                                       })
-                                       
+                                        const UPDATE_PARTICIPANT_TOTAL_SCORE = `UPDATE registrations SET finalScore = ${participantFinalScore} where id=${registrationID}`;
+                                        con.query(UPDATE_PARTICIPANT_TOTAL_SCORE, (err, updatedParticipantFinalScore) => {
+                                            if (err) {
+                                                return res.send(err);
+                                            }
+                                            else {
+                                                return res.status(200).json({
+                                                    message: 'Points were added to the Participant!'
+                                                })
+                                            }
+                                        })
+
                                     }
                                 })
                             }
@@ -1574,22 +1607,22 @@ con.connect(function (err) {
         const classificationID = req.body.classificationID;
         console.log(link);
         var fileName = link.substring(link.lastIndexOf('/'), link.length);
-        var modifiedLink = '../challenges' +fileName+'/'+mainFile;
+        var modifiedLink = '../challenges' + fileName + '/' + mainFile;
         const ACCEPT_CHALLENGE_SUGGESTION_QUERY = `INSERT INTO challenges (name, description, link, mainFile, solution, classificationID, difficultyID) VALUES('${name}', '${description}', '${modifiedLink}', '${mainFile}', '${solution}', ${classificationID}, ${difficultyID}) `;
-        con.query(ACCEPT_CHALLENGE_SUGGESTION_QUERY, (err, results) =>{
-            if(err){
+        con.query(ACCEPT_CHALLENGE_SUGGESTION_QUERY, (err, results) => {
+            if (err) {
                 return res.send(err);
             }
-            else{
+            else {
                 const ALTER_CHALLENGE_SUGGESTION_STATUS = `UPDATE challengeSuggestions SET statusID = ${statusID} where id = ${challengeSuggestionID}`;
-                con.query(ALTER_CHALLENGE_SUGGESTION_STATUS, (err, updatedChallengeSuggestions) =>{
+                con.query(ALTER_CHALLENGE_SUGGESTION_STATUS, (err, updatedChallengeSuggestions) => {
                     mv('./uploads/' + fileName, '../reactapp/src/challenges/' + fileName, function (err) {
                         if (err) {
                             console.log(err);
                         }
                         else {
                             console.log('Ficheiro movido com sucesso');
-                           return res.send({
+                            return res.send({
                                 "code": 200,
                                 "success": "Challenge accepted sucessfully."
                             })
@@ -1598,7 +1631,7 @@ con.connect(function (err) {
                 })
             }
         })
-        
+
     });
 
     //Delete challengeSuggestions
