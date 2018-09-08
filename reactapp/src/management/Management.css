@@ -1,0 +1,58 @@
+#manContainer{
+    width: 100%;
+}
+#managementTitle{
+    text-decoration: underline;
+}
+#outer-management-div{
+        width: 50%;
+        margin-left:auto;
+        margin-right:auto;  
+        padding-bottom: 30%;
+        margin-top: 5%; 
+        
+}
+
+#manCompetitionDiv{
+    border-style: solid;
+    border-width: 3px;
+    border-radius: 5px;
+    float: left;
+    padding: 5%;
+    margin: 1%;
+    box-shadow: 5px 10px;
+    cursor: pointer;
+   
+}
+#manChallengesDiv{
+    border-style: solid;
+    border-width: 3px;
+    border-radius: 5px;
+    float: left;
+    padding: 5%;
+    margin: 1%;
+    box-shadow: 5px 10px;
+    cursor: pointer;
+}
+#manClassificationsDiv{
+    border-style: solid;
+    border-width: 3px;
+    border-radius: 5px;
+    float: left;
+    padding: 5%;
+    margin: 1%;
+    box-shadow: 5px 10px;
+    cursor: pointer;
+    
+}
+#manSuggestionsDiv{
+    clear: both;
+    border-style: solid;
+    border-width: 3px;
+    border-radius: 5px;
+    float: left;
+    padding: 5%;
+    margin: 1%;
+    box-shadow: 5px 10px;
+    cursor: pointer;
+}

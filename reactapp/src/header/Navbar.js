@@ -27,7 +27,7 @@ class NavBar extends Component {
                         <li className="navButton"><Link to="/home">HomePage</Link></li>
                         <li className="navButton" style={floatRight} onClick={this.logout}><Link to="/login">Logout</Link></li>
                         <li className="navButton" style={floatRight}><Link to="/about">About</Link></li>
-                        <li className="navButton" style={floatRight}><Link to="/competitions">Management</Link></li>
+                        <li className="navButton" style={floatRight}><Link to="/management">Management</Link></li>
                         <li className="navUsername" style={floatRight}>Welcome, {JSON.parse(localStorage.getItem('userData')).username}</li>
                     </ul>
                 </header>
