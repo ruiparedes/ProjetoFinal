@@ -35,7 +35,7 @@ class Leaderboard extends Component {
     render() {
         return (
             <div id="leaderboard-div">
-            <div id="divCompetitionName"><h1>Competition Name</h1></div>
+            <div id="divCompetitionName"><h1>{this.props.location.state.competitionName} - Leaderboard</h1></div>
                 <div id="table-div">
                     <div class="divTableRow">
                         <div id="divPartPlace"><h3>Place</h3></div>
@@ -48,7 +48,7 @@ class Leaderboard extends Component {
                         <div id="divParticipantPlace">{registration.place}</div>
                         <div id="divParticipantName">{registration.username}</div>
                         <div id="divParticipantScore">{registration.finalScore}</div>
-                        <div id="divParticipantTime">{registration.finalTime}</div>
+                        <div id="divParticipantTime">{registration.timeInDays}</div>
                     </div>
                     ))}
                 </div>

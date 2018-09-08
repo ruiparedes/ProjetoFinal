@@ -402,9 +402,12 @@ async function doLoopThroughParticipantsAndChallenges(participants, challenges, 
                         days = Math.floor(hours / 24);
                         hours = hours % 24;
                         console.log(days + " days, " + hours + " Hrs, " + mnts + " Minutes, " + seconds + " Seconds");
+                        var timeInDays = days + " day(s) " + hours + " hour(s) " + mnts + " Minute(s) " + seconds + " Second(s)";
+                        timeinDays = timeInDays.toString()
                     }
+                    createScoreboard(participants[participant].id, competitionToClose, finalParticipantScore, finalParticipantTime, timeInDays);
                 }
-                createScoreboard(participants[participant].id, competitionToClose, finalParticipantScore, finalParticipantTime);
+                
             });
         }
     }
@@ -448,9 +451,11 @@ function checkParticipantScoreChallenge(participantID, challengeID) {
 
 
 //10ª Função
-function createScoreboard(participantID, competitionID, totalScore, totalTime) {
+function createScoreboard(participantID, competitionID, totalScore, totalTime, timeInDays) {
     return new Promise(function (resolve, reject) {
-        const GENERATE_SCOREBOARD_COMPETITION_QUERY = `UPDATE registrations SET finalScore= ${totalScore}, finalTime = ${totalTime} where id= ${participantID} and competitionID = ${competitionID} `;
+        console.log('Time in Days');
+        console.log(timeInDays);
+        const GENERATE_SCOREBOARD_COMPETITION_QUERY = `UPDATE registrations SET finalScore= ${totalScore}, finalTime = ${totalTime}, timeInDays ='${timeInDays}'  where id= ${participantID} and competitionID = ${competitionID} `;
         con.query(GENERATE_SCOREBOARD_COMPETITION_QUERY, (err, scoreboard) => {
             if (err) {
                 reject(err);
@@ -519,7 +524,7 @@ con.connect(function (err) {
         console.log("Table Competitions Created");
     });
 
-    var RegistrationsTb = "CREATE TABLE if not exists registrations (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL, competitionID INT NOT NULL, finalScore INT(3), finalTime INT(15), place INT(2) ,FOREIGN KEY (userID) REFERENCES users(id), FOREIGN KEY (competitionID) REFERENCES competitions(id), registrationDate DATETIME NOT NULL)";
+    var RegistrationsTb = "CREATE TABLE if not exists registrations (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL, competitionID INT NOT NULL, finalScore INT(3), finalTime INT(15), timeInDays VARCHAR(70), place INT(2) ,FOREIGN KEY (userID) REFERENCES users(id), FOREIGN KEY (competitionID) REFERENCES competitions(id), registrationDate DATETIME NOT NULL)";
     con.query(RegistrationsTb, function (err, result) {
         if (err) throw err;
         console.log("Table Registrations Created");
@@ -911,11 +916,9 @@ con.connect(function (err) {
 
     //GetAllCompetitionRegistrations
 
-
-
     app.get('/api/registrations/getCompetitionRegistrations/:competitionID', (req, res) => {
         const competitionID = req.params.competitionID;
-        const SELECT_ALL_COMPETITION_REGISTRATIONS = `SELECT r.id, u.username, r.competitionID, r.finalScore, r.finalTime, r.place, r.registrationDate FROM registrations r, users u WHERE r.competitionID = ${competitionID} and r.userID = u.id ORDER BY place`;
+        const SELECT_ALL_COMPETITION_REGISTRATIONS = `SELECT r.id, u.username, r.competitionID, r.finalScore, r.finalTime, r.timeInDays, r.place, r.registrationDate FROM registrations r, users u WHERE r.competitionID = ${competitionID} and r.userID = u.id ORDER BY place`;
 
         con.query(SELECT_ALL_COMPETITION_REGISTRATIONS, (err, compRegistrations) => {
             if (err) {

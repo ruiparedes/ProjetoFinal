@@ -13,7 +13,8 @@ class CompetitionsList extends React.Component {
             competitionToEnter: null,
             redirectToCompetitionChallenges: false,
             redirectToLeaderBoard: false,
-            leaderboardToEnter:null
+            leaderboardToEnter:null,
+            leaderboardCompetitionName: null
 
         }
         this.fetchCompetitions = this.fetchCompetitions.bind(this);
@@ -80,8 +81,8 @@ class CompetitionsList extends React.Component {
 
     }
 
-    enterLeaderboard(competitionID){
-        this.setState({leaderboardToEnter: competitionID, redirectToLeaderBoard: true});
+    enterLeaderboard(competitionID, competitionName){
+        this.setState({leaderboardToEnter: competitionID, leaderboardCompetitionName: competitionName ,redirectToLeaderBoard: true});
     }
 
 
@@ -99,7 +100,7 @@ class CompetitionsList extends React.Component {
             this.setState({redirectToLeaderBoard: false});
             return <Redirect to={{
                 pathname: '/leaderboard',
-                state: {competitionID: this.state.leaderboardToEnter},
+                state: {competitionID: this.state.leaderboardToEnter, competitionName: this.state.leaderboardCompetitionName},
             }} />
         }
 
@@ -115,7 +116,7 @@ class CompetitionsList extends React.Component {
                         <div id="buttonDiv">
                             {this.isRegistered(competition) ? <button type="submit" value="EnterInCompetition" className="EnterInCompetitionButton" id="enterButton" onClick={() => {this.enterCompetition(competition.id)}}  >Entrar</button>
                                 : <button type="submit" value="RegisterInCompetition" className="RegisterInCompetitionButton" id="registerButton" onClick={() => {this.registerCompetition(competition.id)}} >Registar</button>}</div>
-                                <div id="buttonDiv">{competition.statusName == 'Closed' ? <button type="submit" value="EnterLeaderboard" className="EnterLeaderboard" id="enterLeaderboard" onClick={() => {this.enterLeaderboard(competition.id)}}  >Leaderboard</button>
+                                <div id="buttonDiv">{competition.statusName == 'Closed' ? <button type="submit" value="EnterLeaderboard" className="EnterLeaderboard" id="enterLeaderboard" onClick={() => {this.enterLeaderboard(competition.id, competition.name)}}  >Leaderboard</button>
                                 : <div></div>}</div>
                     </div>
                 ))}
