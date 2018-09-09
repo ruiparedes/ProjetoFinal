@@ -7,7 +7,7 @@ import Home from "./home/Home";
 import Login from "./user/login/Login";
 import Signup from "./user/signup/Signup";
 import About from "./about/About";
-import Competitions from "./management/competitions/Competitions";
+import CompetitionsManagement from "./management/competitions/CompetitionsManagement";
 import ChallengesList from "./challengesList/ChallengesList";
 import AttackPage from "./challengesList/AttackPage";
 import CompetitionsList from "./competitions/CompetitionsList";
@@ -16,6 +16,7 @@ import ChallengeSuggestion from "./suggestions/ChallengeSuggestion";
 import Challenge from "./competitions/Challenge";
 import Leaderboard from "./competitions/Leaderboard";
 import Management from "./management/Management";
+import AddCompetition from "./management/competitions/AddCompetition";
 
 class App extends React.Component {
   render() {
@@ -29,7 +30,7 @@ class App extends React.Component {
                 <Route exact path="/signup" component={Signup} />
                 <Route exact path="/home" component={Home} />
                 <Route exact path="/login" component={Login} />
-                <Route exact path="/competitions" component={Competitions} />
+                <Route exact path="/management/competitions" component={CompetitionsManagement} />
                 <Route exact path="/challengesList" component={ChallengesList} />
                 <Route exact path="/attack/:nameId/" component={AttackPage} />
                 <Route exact path="/competitionsList" component={CompetitionsList} />
@@ -38,6 +39,7 @@ class App extends React.Component {
                 <Route exact path="/challenge/:name/" component={Challenge} />
                 <Route exact path="/leaderboard" component={Leaderboard} />
                 <Route exact path="/management" component={Management} />
+                <Route exact path="/management/competitions/addCompetition" component={AddCompetition} />
                 </Switch>
               </div>
           </div>

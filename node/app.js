@@ -477,7 +477,7 @@ con.connect(function (err) {
     if (err) throw err;
     console.log("Connected to Mysql DB!");
 
-    var UsersTb = "CREATE TABLE if not exists users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(50) NOT NULL UNIQUE, password VARCHAR(20) NOT NULL, name VARCHAR(50) NOT NULL, email VARCHAR(50) NOT NULL UNIQUE, role VARCHAR(15) NOT NULL, creationDate DATE)";
+    var UsersTb = "CREATE TABLE if not exists users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(50) NOT NULL UNIQUE, password VARCHAR(20) NOT NULL, name VARCHAR(50) NOT NULL, email VARCHAR(50) NOT NULL UNIQUE, role VARCHAR(15) NOT NULL, creationDate DATETIME)";
     con.query(UsersTb, function (err, result) {
         if (err) throw err;
         console.log("Table Users Created");
@@ -613,7 +613,7 @@ con.connect(function (err) {
     // USER METHODS -------------------------------------------------------------------------------------------------------------------------------------
 
     //Get Users
-    const SELECT_ALL_USERS_QUERY = `SELECT id, username, password, name, email, role, DATE_FORMAT(creationDate, '%d-%m-%y') creationDate  FROM users`;
+    const SELECT_ALL_USERS_QUERY = `SELECT id, username, password, name, email, role, DATE_FORMAT(creationDate, '%d-%m-%y  %H:%i:%s') creationDate  FROM users`;
 
     app.get('/api/users/View', (req, res) => {
         con.query(SELECT_ALL_USERS_QUERY, (err, results) => {
@@ -631,9 +631,9 @@ con.connect(function (err) {
     //Add User
 
     app.post('/api/users/Add', (req, res) => {
-        const { username, password, name, email, role, creationDate } = req.body;
-        console.log(username, password, name, role, creationDate);
-        const INSERT_USER_QUERY = `INSERT INTO users (username, password, name, email, role, creationDate) VALUES('${username}', '${password}', '${name}', '${email}', '${role}', STR_TO_DATE('${creationDate}', '%d-%m-%Y') )`;
+        const { username, password, name, email, role } = req.body;
+        console.log(username, password, name, role);
+        const INSERT_USER_QUERY = `INSERT INTO users (username, password, name, email, role, creationDate) VALUES('${username}', '${password}', '${name}', '${email}', '${role}', DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') )`;
         con.query(INSERT_USER_QUERY, (err, results) => {
             if (err) {
                 console.log("Error Ocurred", err);
@@ -708,7 +708,7 @@ con.connect(function (err) {
 
     app.get('/api/getcompetitionByID/:id', (req, res) => {
         const id = req.params.id;
-        const SELECT_COMPETITIONBYID_QUERY = `SELECT c.id, c.name, c.maxParticipants, c.maxScore, DATE_FORMAT(c.startDate, '%d-%m-%y') startDate, DATE_FORMAT(c.endDate, '%d-%m-%y') endDate, c.totalParticipants, s.statusName FROM competitions c, status s where c.statusID = s.id and  c.id = ${id}`;
+        const SELECT_COMPETITIONBYID_QUERY = `SELECT c.id, c.name, c.maxParticipants, c.maxScore, DATE_FORMAT(c.startDate, '%d-%m-%y  %H:%i:%s') startDate, DATE_FORMAT(c.endDate, '%d-%m-%y  %H:%i:%s') endDate, c.totalParticipants, s.statusName FROM competitions c, status s where c.statusID = s.id and  c.id = ${id}`;
         con.query(SELECT_COMPETITIONBYID_QUERY, (err, results) => {
             if (err) {
                 console.log("ERRO ERRO");
@@ -724,7 +724,7 @@ con.connect(function (err) {
 
 
     //Get Competitions
-    const SELECT_ALL_COMPETITIONS_QUERY = `SELECT c.id, c.name, c.maxParticipants, c.maxScore, DATE_FORMAT(c.startDate, '%d-%m-%y') startDate, DATE_FORMAT(c.endDate, '%d-%m-%y') endDate, c.totalParticipants, s.statusName FROM competitions c, status s where c.statusID = s.id`;
+    const SELECT_ALL_COMPETITIONS_QUERY = `SELECT c.id, c.name, c.maxParticipants, c.maxScore, DATE_FORMAT(c.startDate, '%d-%m-%y  %H:%i:%s') startDate, DATE_FORMAT(c.endDate, '%d-%m-%y  %H:%i:%s') endDate, c.totalParticipants, s.statusName FROM competitions c, status s where c.statusID = s.id`;
 
     app.get('/api/competitions/View', (req, res) => {
         con.query(SELECT_ALL_COMPETITIONS_QUERY, (err, results) => {
@@ -744,7 +744,7 @@ con.connect(function (err) {
     app.post('/api/competitions/Add', (req, res) => {
         const { name, maxParticipants, maxScore, startDate, endDate, totalParticipants, statusID } = req.body;
         console.log(name, maxParticipants, maxScore, startDate, endDate, totalParticipants, statusID);
-        const INSERT_COMPETITION_QUERY = `INSERT INTO competitions (name, maxParticipants, maxScore, startDate, endDate, totalParticipants, statusID ) VALUES('${name}', ${maxParticipants}, ${maxScore}, STR_TO_DATE('${startDate}', '%d-%m-%Y'), STR_TO_DATE('${endDate}', '%d-%m-%Y'), ${totalParticipants}, ${statusID} )`;
+        const INSERT_COMPETITION_QUERY = `INSERT INTO competitions (name, maxParticipants, maxScore, startDate, endDate, totalParticipants, statusID ) VALUES('${name}', ${maxParticipants}, ${maxScore}, DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'), DATE_FORMAT('${endDate}', '%Y-%m-%d %H:%i:%s'), ${totalParticipants}, ${statusID})`;
         con.query(INSERT_COMPETITION_QUERY, (err, results) => {
             if (err) {
                 return res.send(err)
@@ -918,7 +918,7 @@ con.connect(function (err) {
 
     app.get('/api/registrations/getCompetitionRegistrations/:competitionID', (req, res) => {
         const competitionID = req.params.competitionID;
-        const SELECT_ALL_COMPETITION_REGISTRATIONS = `SELECT r.id, u.username, r.competitionID, r.finalScore, r.finalTime, r.timeInDays, r.place, r.registrationDate FROM registrations r, users u WHERE r.competitionID = ${competitionID} and r.userID = u.id ORDER BY place`;
+        const SELECT_ALL_COMPETITION_REGISTRATIONS = `SELECT r.id, u.username, r.competitionID, r.finalScore, r.finalTime, r.timeInDays, r.place, DATE_FORMAT(r.registrationDate, '%d-%m-%y  %H:%i:%s') FROM registrations r, users u WHERE r.competitionID = ${competitionID} and r.userID = u.id ORDER BY place`;
 
         con.query(SELECT_ALL_COMPETITION_REGISTRATIONS, (err, compRegistrations) => {
             if (err) {
@@ -936,7 +936,7 @@ con.connect(function (err) {
 
 
     //Get REGISTRATIONS
-    const SELECT_ALL_REGISTRATIONS_QUERY = `SELECT id, userID, competitionID, finalScore, finalTime, DATE_FORMAT(registrationDate, '%d-%m-%y') FROM registrations`;
+    const SELECT_ALL_REGISTRATIONS_QUERY = `SELECT id, userID, competitionID, finalScore, finalTime, DATE_FORMAT(registrationDate, '%d-%m-%y  %H:%i:%s') FROM registrations`;
 
     app.get('/api/registrations/View', (req, res) => {
         con.query(SELECT_ALL_REGISTRATIONS_QUERY, (err, results) => {
@@ -982,9 +982,7 @@ con.connect(function (err) {
                 if (competitionInfo[0].totalParticipants < competitionInfo[0].maxParticipants) {
                     const finalScore = 0;
                     const finalTime = 0;
-                    const registrationDate = moment().format('DD-MM-YYYY');
-                    console.log(userID, competitionID, finalScore, finalTime, registrationDate);
-                    const INSERT_REGISTRATION_QUERY = `INSERT INTO registrations (userID, competitionID, finalScore, finalTime, registrationDate) VALUES(${userID}, ${competitionID}, ${finalScore}, ${finalTime}, STR_TO_DATE('${registrationDate}', '%d-%m-%Y'))`;
+                    const INSERT_REGISTRATION_QUERY = `INSERT INTO registrations (userID, competitionID, finalScore, finalTime, registrationDate) VALUES(${userID}, ${competitionID}, ${finalScore}, ${finalTime}, DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'))`;
                     con.query(INSERT_REGISTRATION_QUERY, (err, results) => {
                         if (err) {
                             return res.send(err)
