@@ -17,6 +17,7 @@ import Challenge from "./competitions/Challenge";
 import Leaderboard from "./competitions/Leaderboard";
 import Management from "./management/Management";
 import AddCompetition from "./management/competitions/AddCompetition";
+import AddCompetitionChallenges from "./management/competitions/AddCompetitionChallenges";
 
 class App extends React.Component {
   render() {
@@ -40,6 +41,7 @@ class App extends React.Component {
                 <Route exact path="/leaderboard" component={Leaderboard} />
                 <Route exact path="/management" component={Management} />
                 <Route exact path="/management/competitions/addCompetition" component={AddCompetition} />
+                <Route exact path="/management/competitions/addCompetitionChallenges" component={AddCompetitionChallenges} />
                 </Switch>
               </div>
           </div>

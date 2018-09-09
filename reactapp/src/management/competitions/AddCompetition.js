@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { URL } from '../../shared/Constants';
 import './AddCompetition.css';
+import Notifications, {notify} from 'react-notify-toast';
+import { Route, Redirect } from 'react-router-dom';
 
 
 class AddCompetition extends Component {
@@ -12,7 +14,9 @@ class AddCompetition extends Component {
         this.state = {
             competitionName: '',
             maxParticipants: 0,
-            endDate: null
+            endDate: null,
+            redirectCompetitionChallenges:false,
+            competitionCreatedID: null
         }
 
         this.addCompetition = this.addCompetition.bind(this);
@@ -36,7 +40,18 @@ class AddCompetition extends Component {
                 headers: new Headers({
                     'Content-Type': 'application/json'
                 })
-            });
+            }).then(res => res.json().then(data => ({status: res.status, body: data})))
+            .then(obj =>{
+                if(obj.status ===200){
+                    notify.show('Competition Created Successfully!');
+                    this.setState({competitionCreatedID: obj.body.insertedCompetitionID, redirectCompetitionChallenges: true});
+                }
+                else{
+                    notify.show('Something went wrong, check the information provided! Competition name may already exist!');
+                }
+                console.log(obj);
+                console.log(obj.body.insertedCompetitionID);
+            })
 
         }
 
@@ -46,6 +61,18 @@ class AddCompetition extends Component {
 
 
     render() {
+        console.log(this.state.competitionCreatedID);
+        if(this.state.redirectCompetitionChallenges==true){
+            this.setState({redirectCompetitionChallenges: false});
+            return <Redirect
+            to={{
+              pathname: "/management/competitions/addCompetitionChallenges" ,
+              state: {competitionID: this.state.competitionCreatedID}
+            }}
+          />  
+        }
+
+
         return (
             <div id="addCompetitionOuterDiv">
                 <div id="addCompetitionInnerDiv"><h1>Create Competition</h1>
@@ -60,6 +87,7 @@ class AddCompetition extends Component {
 
                     </div>
                 </div>
+                <div><Notifications /></div>
             </div>
         );
     }

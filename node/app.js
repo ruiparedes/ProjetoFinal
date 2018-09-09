@@ -548,7 +548,7 @@ con.connect(function (err) {
         console.log("Table Challenges Created");
     });
 
-    var ChallengesPerCompetitionTb = "CREATE TABLE if not exists challengesPerCompetition (id INT AUTO_INCREMENT PRIMARY KEY, competitionID INT NOT NULL, challengeID INT NOT NULL, FOREIGN KEY (competitionID) REFERENCES competitions(id), FOREIGN KEY (challengeID) REFERENCES challenges(id), challengePoints INT(3) NOT NULL, challengeOrder INT(3) NOT NULL)";
+    var ChallengesPerCompetitionTb = "CREATE TABLE if not exists challengesPerCompetition (id INT AUTO_INCREMENT PRIMARY KEY, competitionID INT NOT NULL, challengeID INT NOT NULL, FOREIGN KEY (competitionID) REFERENCES competitions(id), FOREIGN KEY (challengeID) REFERENCES challenges(id), challengePoints INT(3) NOT NULL)";
     con.query(ChallengesPerCompetitionTb, function (err, result) {
         if (err) throw err;
         console.log("Table ChallengesPerCompetition Created");
@@ -750,10 +750,16 @@ con.connect(function (err) {
         const INSERT_COMPETITION_QUERY = `INSERT INTO competitions (name, maxParticipants, maxScore, startDate, endDate, totalParticipants, statusID ) VALUES('${name}', ${maxParticipants}, ${maxScore}, DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'), DATE_FORMAT('${endDate}', '%Y-%m-%d %H:%i:%s'), ${totalParticipants}, ${statusID})`;
         con.query(INSERT_COMPETITION_QUERY, (err, results) => {
             if (err) {
-                return res.send(err)
+                return res.status(400).json({
+                    message: 'Failed to Add the competition'
+                })
             }
             else {
-                return res.send('Sucessfully added the competition')
+                console.log(results.insertId);
+                return res.status(200).json({
+                    message: 'Sucessfully Added the Competition',
+                    insertedCompetitionID: results.insertId
+                })
             }
         });
     });
@@ -852,7 +858,7 @@ con.connect(function (err) {
     //Get All Competition Challenges
     app.get('/api/challengesPerCompetition/getCompetitionChallenges/:competitionID', (req, res) => {
         const competitionID = req.params.competitionID;
-        const SELECT_ALL_COMPETITION_CHALLENGES_QUERY = `SELECT cpc.id, cpc.challengeID, cpc.challengeOrder, cpc.challengePoints, cl.name classification, cpc.competitionID, c.description, d.level, c.link, c.mainFile, c.name  FROM challengesPerCompetition cpc, challenges c, difficulty d, classifications cl where cpc.competitionID = ${competitionID} and cpc.challengeID = c.id and c.difficultyID = d.id and c.classificationID = cl.id`;
+        const SELECT_ALL_COMPETITION_CHALLENGES_QUERY = `SELECT cpc.id, cpc.challengeID, cpc.challengePoints, cl.name classification, cpc.competitionID, c.description, d.level, c.link, c.mainFile, c.name  FROM challengesPerCompetition cpc, challenges c, difficulty d, classifications cl where cpc.competitionID = ${competitionID} and cpc.challengeID = c.id and c.difficultyID = d.id and c.classificationID = cl.id`;
         con.query(SELECT_ALL_COMPETITION_CHALLENGES_QUERY, (err, results) => {
             if (err) {
                 return res.send(err);
@@ -885,15 +891,40 @@ con.connect(function (err) {
     //Add challengesPerCompetition
 
     app.post('/api/challengesPerCompetition/Add', (req, res) => {
-        const { competitionID, challengeID, challengePoints, challengeOrder } = req.body;
-        console.log(competitionID, challengeID, challengePoints, challengeOrder);
-        const INSERT_CHALLENGEPERCOMPETITION_QUERY = `INSERT INTO challengesPerCompetition (competitionID, challengeID, challengePoints, challengeOrder) VALUES(${competitionID}, ${challengeID}, ${challengePoints}, ${challengeOrder} )`;
+        const { competitionID, challengeID, challengePoints} = req.body;
+        console.log(competitionID, challengeID, challengePoints);
+        const INSERT_CHALLENGEPERCOMPETITION_QUERY = `INSERT INTO challengesPerCompetition (competitionID, challengeID, challengePoints) VALUES(${competitionID}, ${challengeID}, ${challengePoints} )`;
         con.query(INSERT_CHALLENGEPERCOMPETITION_QUERY, (err, results) => {
             if (err) {
+                console.log(err);
                 return res.send(err)
             }
             else {
+                const SELECT_MAX_COMPETITION_SCORE = `SELECT maxScore FROM competitions WHERE id = ${competitionID}`;
+                con.query(SELECT_MAX_COMPETITION_SCORE, (err, competitionScore) =>{
+                    if (err) {
+                        console.log(err);
+                        return res.send(err)
+                    }
+                    else{
+                        console.log(competitionScore)
+                        var competitionMaxScore = competitionScore[0].maxScore;
+                        var maxScore = competitionMaxScore + challengePoints;
+                        console.log(maxScore);
+                        const UPDATE_MAX_COMPETITION_SCORE = `UPDATE competitions SET maxScore = ${maxScore} WHERE id= ${competitionID}`;
+                con.query(UPDATE_MAX_COMPETITION_SCORE, (err, competitionUpdatedMaxScore) =>{
+                    if (err) {
+                        console.log(err);
+                        return res.send(err)
+                    }
+                    else{
+                        console.log('Challenge added to the Competition');
                 return res.send('Sucessfully added the challenge in the  Competition')
+                    }
+                })
+                    }
+                })
+                
             }
         });
     });
