@@ -742,8 +742,11 @@ con.connect(function (err) {
     //Add Competition
 
     app.post('/api/competitions/Add', (req, res) => {
-        const { name, maxParticipants, maxScore, startDate, endDate, totalParticipants, statusID } = req.body;
-        console.log(name, maxParticipants, maxScore, startDate, endDate, totalParticipants, statusID);
+        const { name, maxParticipants, endDate} = req.body;
+        const maxScore=0;
+        const totalParticipants=0;
+        const statusID = 1;
+        console.log(name, maxParticipants, maxScore, endDate, totalParticipants, statusID);
         const INSERT_COMPETITION_QUERY = `INSERT INTO competitions (name, maxParticipants, maxScore, startDate, endDate, totalParticipants, statusID ) VALUES('${name}', ${maxParticipants}, ${maxScore}, DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'), DATE_FORMAT('${endDate}', '%Y-%m-%d %H:%i:%s'), ${totalParticipants}, ${statusID})`;
         con.query(INSERT_COMPETITION_QUERY, (err, results) => {
             if (err) {
