@@ -599,7 +599,7 @@ con.connect(function (err) {
         console.log("Table QuestionSuggestions Created");
     });
 
-    var ChallengeSuggestionsTb = "CREATE TABLE if not exists challengeSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL , name VARCHAR(100), description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(100) NOT NULL, solution VARCHAR(100) NOT NULL, difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id), FOREIGN KEY (userID) REFERENCES users(id), statusID INT(1) NOT NULL, FOREIGN KEY (statusID) REFERENCES suggestionsStatus(id))";
+    var ChallengeSuggestionsTb = "CREATE TABLE if not exists challengeSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL , name VARCHAR(100), description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(100) NOT NULL, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id), FOREIGN KEY (userID) REFERENCES users(id), statusID INT(1) NOT NULL, FOREIGN KEY (statusID) REFERENCES suggestionsStatus(id), FOREIGN KEY (classificationID) REFERENCES classifications(id))";
     con.query(ChallengeSuggestionsTb, function (err, result) {
         if (err) throw err;
         console.log("Table ChallengeSuggestions Created");
@@ -1705,7 +1705,7 @@ con.connect(function (err) {
     // challengeSuggestions METHODS -------------------------------------------------------------------------------------------------------------------------------------
 
     //Get challengeSuggestions
-    const SELECT_ALL_CHALLENGESUGGESTIONS_QUERY = 'SELECT* FROM challengeSuggestions';
+    const SELECT_ALL_CHALLENGESUGGESTIONS_QUERY = 'SELECT cs.id, cs.name, u.username, cs.description, cs.link, cs.mainFile, cs.solution, d.id difficultyID ,d.level, c.name classification, c.id classificationID, ss.status, ss.id statusID  FROM challengeSuggestions cs, users u, difficulty d, classifications c, suggestionsStatus ss where cs.userID = u.id and cs.difficultyID = d.id and cs.classificationID = c.id and cs.statusID = ss.id';
 
     app.get('/api/challengeSuggestions/View', (req, res) => {
         con.query(SELECT_ALL_CHALLENGESUGGESTIONS_QUERY, (err, results) => {
@@ -1742,7 +1742,8 @@ con.connect(function (err) {
                 const solution = req.body.solution;
                 const difficultyID = req.body.difficultyID;
                 const statusID = 1;
-                const ADD_CHALLENGESUGGESTION_QUERY = `INSERT INTO challengeSuggestions (userID, name, description,  link, mainFile, solution, difficultyID, statusID) VALUES( ${userID}, '${name}', '${description}', '${link}', '${mainFile}', '${solution}', ${difficultyID}, ${statusID})`;
+                const classificationID = req.body.classificationID;
+                const ADD_CHALLENGESUGGESTION_QUERY = `INSERT INTO challengeSuggestions (userID, name, description,  link, mainFile, solution, classificationID,difficultyID, statusID) VALUES( ${userID}, '${name}', '${description}', '${link}', '${mainFile}', '${solution}', ${classificationID},${difficultyID}, ${statusID})`;
                 con.query(ADD_CHALLENGESUGGESTION_QUERY, (err, results) => {
                     if (err) {
                         res.send(err);
@@ -1801,18 +1802,17 @@ con.connect(function (err) {
 
     });
 
-    //Delete challengeSuggestions
-
-    app.post('/api/challengeSuggestions/Delete', (req, res) => {
+    //Deny challengeSuggestions
+    app.post('/api/challengeSuggestions/Deny', (req, res) => {
         const id = req.body.id;
         console.log(req.body);
-        const DELETE_CHALLENGESUGGESTIONS_QUERY = `DELETE FROM challengeSuggestions WHERE id = ${id}`;
-        con.query(DELETE_CHALLENGESUGGESTIONS_QUERY, (err, res) => {
+        const DENY_CHALLENGESUGGESTIONS_QUERY = `UPDATE challengeSuggestions SET statusID = 3 WHERE id = ${id}`;
+        con.query(DENY_CHALLENGESUGGESTIONS_QUERY, (err, results) => {
             if (err) {
                 return res.send(err)
             }
             else {
-                return res.send('Sucessfully Deleted the challenge from the suggestions')
+                return res.send('Sucessfully Denyed the challenge from the suggestions')
             }
         });
     });

@@ -1,0 +1,32 @@
+#managementChallAcceptButton{
+    border: 2px solid black;
+    border-radius: 2px;
+    background-color:#4CAF50; 
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 15px; 
+    padding: 2%;
+    margin-top: 2%; 
+}
+#managementChallDenyButton{
+    border: 2px solid black;
+    border-radius: 2px;
+    background-color:RED; 
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 15px; 
+    padding: 2%;
+    margin-top: 2%; 
+}
+#managementchallengechallengeStatusTitle{
+    border: 1px solid black;
+	display: table-cell;
+    padding: 1%;
+    text-align: center;
+}
+#managementchallengechallengeStatusValue{
+    border: 1px solid black;
+	display: table-cell;
+    padding: 1%;
+    text-align: center;
+}
