@@ -12,7 +12,8 @@ class AddCompetitionChallenges extends Component {
             challenges: [],
             competitionChallenges: [],
             selectedChallenge: 0,
-            challengeToInsertScore: 0
+            challengeToInsertScore: 0,
+            redirectToCompetitionStatus: false
         }
 
         this.fetchCompetitionInfo = this.fetchCompetitionInfo.bind(this);
@@ -21,6 +22,7 @@ class AddCompetitionChallenges extends Component {
         this.handleSelectedOption = this.handleSelectedOption.bind(this);
         this.onChange = this.onChange.bind(this);
         this.addChallengeToCompetition = this.addChallengeToCompetition.bind(this);
+        this.redirectToUpdateCompetitionStatus = this.redirectToUpdateCompetitionStatus.bind(this);
     }
 
     componentDidMount() {
@@ -94,9 +96,26 @@ class AddCompetitionChallenges extends Component {
         });
     }
 
+    redirectToUpdateCompetitionStatus(){
+        this.setState({redirectToCompetitionStatus: true});
+    }
+
 
 
     render() {
+
+        if(this.state.redirectToCompetitionStatus == true) {
+            this.setState({redirectToCompetitionStatus: false});
+            return <Redirect to={{
+                pathname: '/management/competitions/alterCompetitionStatus',
+                state: {competitionID: this.props.location.state.competitionID, competitionName: this.state.competitionInfo.name, competitionCurrentStatus: this.state.competitionInfo.statusName},
+            }} />
+        }
+
+
+
+
+
         console.log(this.state.selectedChallenge);
         return (
             <div id="addChallengesToCompetitionOuterDiv">
@@ -135,6 +154,7 @@ class AddCompetitionChallenges extends Component {
                             </div>
                             <div id="newCompetitionScoreDiv"><h3 id="newCompetitionScoreTitle">Score: </h3><input type="number" id="newCompetitionChallengeScoreInput" className="newCompetitionChallengeScore" onChange={this.onChange} required></input></div>
                             <div id="addChallengeToCompetitionButtonDiv"><button type="submit" value="addChallengeToCompetitionButton" id="addChallengeToCompButton" onClick={this.addChallengeToCompetition}>Add Challenge to Competition</button></div>
+                            <div id="addChallengeToCompetitionNextStepDiv"><button type="submit" value="addChallengeToCompetitionNextStepButton" id="addChallengeToCompNextStepButton" onClick={this.redirectToUpdateCompetitionStatus}>Next Step >></button></div>
                         </div>
                     </div>
                 </div>

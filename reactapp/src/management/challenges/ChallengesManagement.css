@@ -1,10 +1,10 @@
-#competitionManContainer{
+#challengeManContainer{
     width: 100%;
 }
-#competitionManagementTitle{
+#challengeManagementTitle{
     text-decoration: underline;
 }
-#outer-management-competition-div{
+#outer-management-challenge-div{
         width: 80%;
         margin-left:auto;
         margin-right:auto;  
@@ -19,120 +19,102 @@
 .divTableRow {
 	display: table-row;
 }
-.divTableHeading {
-	background-color: #EEE;
-	display: table-header-group;
-}
-.divTableCell, .divTableHead {
-	border: 1px solid black;
-	display: table-cell;
-	padding: 3px 10px;
-}
-.divTableBody {
-    display: table-row-group;
-}
 
-#managementCompetitionCompetitionNameTitle{
+#managementchallengechallengeNameTitle{
     border: 1px solid black;
 	display: table-cell;
     padding: 1%;
     text-align: center;
 }
-#managementCompetitionCompetitionStatusTitle{
+#managementchallengechallengeDescriptionTitle{
     border: 1px solid black;
 	display: table-cell;
     text-align: center;
 }
-#managementCompetitionCompetitionStartDateTitle{
+#managementchallengechallengeLinkTitle{
     border: 1px solid black;
 	display: table-cell;
     text-align: center;
 }
-#managementCompetitionCompetitionEndDateTitle{
+#managementchallengechallengeMainFileTitle{
     border: 1px solid black;
 	display: table-cell; 
     text-align: center;
 }
-#managementCompetitionCompetitionMaxScoreTitle{
+#managementchallengechallengeSolutionTitle{
     border: 1px solid black;
     display: table-cell;
     text-align: center;
 }
-#managementCompetitionCompetitionMaxParticipantsTitle{
+#managementchallengechallengeClassificationTitle{
     border: 1px solid black;
     display: table-cell;
     text-align: center;
 }
 
-#managementCompetitionCompetitionTotalParticipantsTitle{
+#managementchallengechallengeDifficultyTitle{
     border: 1px solid black;
     display: table-cell; 
     text-align: center;
 }
 
 
-#managementCompetitionCompetitionNameValue{
-    border: 1px solid black;
-	display: table-cell;
-    padding: 1%;
-    text-align: center;
-}
-#managementCompetitionCompetitionStatusValue{
+#managementchallengechallengeNameValue{
     border: 1px solid black;
 	display: table-cell;
     text-align: center;
+    padding-right: 5%;
 }
-#managementCompetitionCompetitionStartDateValue{
+#managementchallengechallengeDescriptionValue{
     border: 1px solid black;
 	display: table-cell;
     text-align: center;
 }
-#managementCompetitionCompetitionEndDateValue{
+#managementchallengechallengeLinkValue{
+    border: 1px solid black;
+	display: table-cell;
+    text-align: center;
+}
+#managementchallengechallengeMainFileValue{
     border: 1px solid black;
 	display: table-cell; 
     text-align: center;
 }
-#managementCompetitionCompetitionMaxScoreValue{
+#managementchallengechallengeSolutionValue{
     border: 1px solid black;
     display: table-cell;
     text-align: center;
 }
-#managementCompetitionCompetitionMaxParticipantsValue{
+#managementchallengechallengeClassificationValue{
     border: 1px solid black;
     display: table-cell;
     text-align: center;
 }
 
-#managementCompetitionCompetitionTotalParticipantsValue{
+#managementchallengechallengeDifficultyValue{
     border: 1px solid black;
     display: table-cell; 
     text-align: center;
 }
 
 
-#managementCompetitionButtonsTitleDiv{
+#managementchallengeButtonsTitleDiv{
     border: 1px solid black;
     display: table-cell;
     text-align: center;
 }
 
-#managementCompetitionButtonsDiv{
+#managementchallengeButtonsDiv{
     border: 1px solid black;
     display: table-cell; 
     text-align: center;
 }
 
-#managementCompetitionEndDateButtonDiv{
-    margin-bottom: 3%;
-}
-#managementCompetitionMaxParticipantsButtonDiv{
-    margin-bottom: 3%;
-}
-#managementCompetitionStatusButtonDiv{
+#managementchallengeDeleteButtonDiv{
     margin-bottom: 3%;
 }
 
-#managementCompeEndDateButton{
+#managementChallDeleteButton{
     border: 2px solid black;
     border-radius: 2px;
     background-color:#4CAF50; 
@@ -140,24 +122,8 @@
     cursor: pointer;
     font-size: 15px;    
 }
-#managementCompMaxParticipantsButton{
-    border: 2px solid black;
-    border-radius: 2px;
-    background-color:cadetblue; 
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 15px; 
-}
-#managementCompStatusButton{
-    border: 2px solid black;
-    border-radius: 2px;
-    background-color:royalblue; 
-    border-radius: 3px;
-    cursor: pointer;
-    font-size: 15px; 
-}
 
-#managementCompAddCompetition{
+#managementChallengeAddchallenge{
     width: 20%;
     padding-bottom: 2%;
     font-size: 20px;

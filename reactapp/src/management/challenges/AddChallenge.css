@@ -1,0 +1,113 @@
+#addChallengeOuterDiv{
+    width: 100%;
+}
+#addChallengeInnerDiv{
+    width:40%;
+    margin-top: 2%;
+    margin-left: auto;
+    margin-right: auto;
+}
+#addChallengeFormDiv{
+    background-color:#eee; 
+    padding-bottom: 10%;
+    border: 2px solid black;
+border-radius: 3px;
+padding-left: 5%;
+padding-right: 5%;
+}
+#addChallengeNameTitle{
+    text-decoration: underline;
+}
+#challengeNameInput{
+    width: 50%;
+text-align: center;
+font-size: 20px;
+background-color:#eee; 
+border: 2px solid black;
+border-radius: 3px;
+}
+#addChallengeDescriptionTitle{
+    text-decoration: underline;
+}
+#challengeDescriptionInput{
+    width: 50%;
+    text-align: center;
+    font-size: 20px;
+    background-color:#eee; 
+    border: 2px solid black;
+    border-radius: 3px;
+}
+#addChallengeFolderTitle{
+    text-decoration: underline;
+}
+#challengeFolderInput{
+    width: 50%;
+    text-align: center;
+    font-size: 20px;
+    background-color:#eee; 
+    border: 2px solid black;
+    border-radius: 3px;
+}
+#addChallengeMainFileTitle{
+    text-decoration: underline;
+}
+#challengeMainFileInput{
+    width: 50%;
+    text-align: center;
+    font-size: 20px;
+    background-color:#eee; 
+    border: 2px solid black;
+    border-radius: 3px;
+}
+
+#addChallengeSolutionTitle{
+    text-decoration: underline;
+}
+#challengeSolutionInput{
+    width: 50%;
+    text-align: center;
+    font-size: 20px;
+    background-color:#eee; 
+    border: 2px solid black;
+    border-radius: 3px;
+}
+
+#custom-select{
+    text-decoration: underline;
+}
+#selectClassification{
+    background-color: aquamarine;
+    padding-top: 2%;
+    padding-bottom: 2%;
+    width: 40%;
+    font-size: 20px;
+    cursor: pointer;
+    border: 2px solid black;
+    border-radius: 2%;
+}
+#selectDifficulty{
+    background-color: aquamarine;
+    padding-top: 2%;
+    padding-bottom: 2%;
+    width: 40%;
+    font-size: 20px;
+    cursor: pointer;
+    border: 2px solid black;
+    border-radius: 2%;
+}
+#addChallengeButtonDiv{
+    margin-top: 2%;
+
+}
+#addChallButton{
+    width: 100%;
+    padding-bottom: 4%;
+    font-size: 20px;
+    text-align: center;
+    border: 2px solid black;
+    border-radius: 2px;
+    background-color:#4CAF50; 
+    border-radius: 3px;
+    padding-top: 4%;
+    cursor: pointer;
+}

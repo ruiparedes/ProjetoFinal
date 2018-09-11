@@ -407,7 +407,7 @@ async function doLoopThroughParticipantsAndChallenges(participants, challenges, 
                     }
                     createScoreboard(participants[participant].id, competitionToClose, finalParticipantScore, finalParticipantTime, timeInDays);
                 }
-                
+
             });
         }
     }
@@ -610,6 +610,70 @@ con.connect(function (err) {
 
     //Methods DB
 
+    //STATUS METHODS
+
+    //GET ALL STATUS
+
+    app.get('/api/status/View', (req, res) => {
+
+        const SELECT_ALL_STATUS_QUERY = `SELECT * FROM status`;
+        con.query(SELECT_ALL_STATUS_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.json({
+                    status: results
+                })
+            }
+        });
+    });
+
+
+    //UPDATE COMPETITION STATUS
+
+    app.post('/api/competitions/updateStatus', (req, res) => {
+
+        const competitionID = req.body.competitionID;
+        const statusID = req.body.statusID;
+
+
+        const UPDATE_COMPETITION_STATUS_QUERY = `UPDATE competitions SET statusID = ${statusID} where id = ${competitionID}`;
+        con.query(UPDATE_COMPETITION_STATUS_QUERY, (err, results) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({
+                    message: 'Failed to change competition status'
+                })
+            }
+            else {
+                return res.status(200).json({
+                    message: 'Changed the Competition Status sucessfully'
+                })
+            }
+        });
+    });
+
+
+
+    //DIFFICULTY
+    const SELECT_ALL_DIFFICULTIES_QUERY = 'SELECT * FROM difficulty';
+
+    app.get('/api/difficulty/View', (req, res) => {
+        con.query(SELECT_ALL_DIFFICULTIES_QUERY, (err, results) => {
+            if (err) {
+                return res.send(err)
+            }
+            else {
+                return res.json({
+                    difficulty: results
+                })
+            }
+        });
+    });
+
+
+
     // USER METHODS -------------------------------------------------------------------------------------------------------------------------------------
 
     //Get Users
@@ -704,6 +768,47 @@ con.connect(function (err) {
     // COMPETITIONS METHODS -------------------------------------------------------------------------------------------------------------------------------------
 
 
+
+    //UPDATE COMPETITION END DATE
+
+    app.post('/api/competitions/updateEndDate', (req, res) => {
+        const { competitionID, endDate } = req.body;
+        const UPDATE_COMPETITION_ENDDATE_QUERY = `UPDATE competitions SET endDate = DATE_FORMAT('${endDate}', '%Y-%m-%d %H:%i:%s') where id = ${competitionID}`;
+        con.query(UPDATE_COMPETITION_ENDDATE_QUERY, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    message: 'Failed to update the competition End Date'
+                })
+            }
+            else {
+                return res.status(200).json({
+                    message: 'Sucessfully updated the Competition end date'
+                })
+            }
+        });
+    });
+
+    //UPDATE COMPETITION MAX PARTICIPANTS
+
+    app.post('/api/competitions/updateMaxParticipants', (req, res) => {
+        const { competitionID, maxParticipants } = req.body;
+        const UPDATE_COMPETITION_MAX_PARTICIPANTS_QUERY = `UPDATE competitions SET maxParticipants = ${maxParticipants} where id = ${competitionID}`;
+        con.query(UPDATE_COMPETITION_MAX_PARTICIPANTS_QUERY, (err, results) => {
+            if (err) {
+                return res.status(400).json({
+                    message: 'Failed to update the competition Max Participants'
+                })
+            }
+            else {
+                return res.status(200).json({
+                    message: 'Sucessfully updated the Competition Max Participants'
+                })
+            }
+        });
+    });
+
+
+
     //Get Competition by ID
 
     app.get('/api/getcompetitionByID/:id', (req, res) => {
@@ -742,9 +847,9 @@ con.connect(function (err) {
     //Add Competition
 
     app.post('/api/competitions/Add', (req, res) => {
-        const { name, maxParticipants, endDate} = req.body;
-        const maxScore=0;
-        const totalParticipants=0;
+        const { name, maxParticipants, endDate } = req.body;
+        const maxScore = 0;
+        const totalParticipants = 0;
         const statusID = 1;
         console.log(name, maxParticipants, maxScore, endDate, totalParticipants, statusID);
         const INSERT_COMPETITION_QUERY = `INSERT INTO competitions (name, maxParticipants, maxScore, startDate, endDate, totalParticipants, statusID ) VALUES('${name}', ${maxParticipants}, ${maxScore}, DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'), DATE_FORMAT('${endDate}', '%Y-%m-%d %H:%i:%s'), ${totalParticipants}, ${statusID})`;
@@ -827,10 +932,14 @@ con.connect(function (err) {
         const INSERT_CHALLENGE_QUERY = `INSERT INTO challenges (name, description, link, mainFile, solution, classificationID, difficultyID) VALUES('${name}', '${description}', '${link}', '${mainFile}', '${solution}' , ${classificationID}, ${difficultyID} )`;
         con.query(INSERT_CHALLENGE_QUERY, (err, results) => {
             if (err) {
-                return res.send(err)
+                return res.status(400).json({
+                    message: 'Failed to Add Challenge'
+                })
             }
             else {
-                return res.send('Sucessfully added the challenge')
+                return res.status(200).json({
+                    message: 'Successfully added challenge'
+                })
             }
         });
     });
@@ -839,15 +948,38 @@ con.connect(function (err) {
 
     app.post('/api/challenges/Delete', (req, res) => {
         const id = req.body.id;
-        const DELETE_CHALLENGE_QUERY = `DELETE FROM challenges WHERE id = ${id}`;
-        con.query(DELETE_CHALLENGE_QUERY, (err, results) => {
+
+        const CHECK_IF_CHALLENGE_IN_USE = `SELECT * FROM challengesPerCompetition where challengeID = ${id}`;
+        con.query(CHECK_IF_CHALLENGE_IN_USE, (err, exists) => {
             if (err) {
+                console.log(err);
                 return res.send(err)
             }
             else {
-                return res.send('Sucessfully Deleted the challenge')
+                console.log(exists);
+                if (exists.length == 0) {
+                    const DELETE_CHALLENGE_QUERY = `DELETE FROM challenges WHERE id = ${id}`;
+                    con.query(DELETE_CHALLENGE_QUERY, (err, results) => {
+                        if (err) {
+                            return res.send(err)
+                        }
+                        else {
+                            return res.status(200).json({
+                                message: 'Challenge Deleted'
+                            })
+                        }
+                    });
+                }else{
+                    return res.status(400).json({
+                        message: 'Challenge in Use'
+                    })
+                }
             }
         });
+
+
+
+
     });
 
     //--------------------------------------------------------------------------------------------------------------------
@@ -891,7 +1023,7 @@ con.connect(function (err) {
     //Add challengesPerCompetition
 
     app.post('/api/challengesPerCompetition/Add', (req, res) => {
-        const { competitionID, challengeID, challengePoints} = req.body;
+        const { competitionID, challengeID, challengePoints } = req.body;
         console.log(competitionID, challengeID, challengePoints);
         const INSERT_CHALLENGEPERCOMPETITION_QUERY = `INSERT INTO challengesPerCompetition (competitionID, challengeID, challengePoints) VALUES(${competitionID}, ${challengeID}, ${challengePoints} )`;
         con.query(INSERT_CHALLENGEPERCOMPETITION_QUERY, (err, results) => {
@@ -901,30 +1033,30 @@ con.connect(function (err) {
             }
             else {
                 const SELECT_MAX_COMPETITION_SCORE = `SELECT maxScore FROM competitions WHERE id = ${competitionID}`;
-                con.query(SELECT_MAX_COMPETITION_SCORE, (err, competitionScore) =>{
+                con.query(SELECT_MAX_COMPETITION_SCORE, (err, competitionScore) => {
                     if (err) {
                         console.log(err);
                         return res.send(err)
                     }
-                    else{
+                    else {
                         console.log(competitionScore)
                         var competitionMaxScore = competitionScore[0].maxScore;
                         var maxScore = competitionMaxScore + challengePoints;
                         console.log(maxScore);
                         const UPDATE_MAX_COMPETITION_SCORE = `UPDATE competitions SET maxScore = ${maxScore} WHERE id= ${competitionID}`;
-                con.query(UPDATE_MAX_COMPETITION_SCORE, (err, competitionUpdatedMaxScore) =>{
-                    if (err) {
-                        console.log(err);
-                        return res.send(err)
-                    }
-                    else{
-                        console.log('Challenge added to the Competition');
-                return res.send('Sucessfully added the challenge in the  Competition')
+                        con.query(UPDATE_MAX_COMPETITION_SCORE, (err, competitionUpdatedMaxScore) => {
+                            if (err) {
+                                console.log(err);
+                                return res.send(err)
+                            }
+                            else {
+                                console.log('Challenge added to the Competition');
+                                return res.send('Sucessfully added the challenge in the  Competition')
+                            }
+                        })
                     }
                 })
-                    }
-                })
-                
+
             }
         });
     });
@@ -1573,7 +1705,7 @@ con.connect(function (err) {
     // challengeSuggestions METHODS -------------------------------------------------------------------------------------------------------------------------------------
 
     //Get challengeSuggestions
-    const SELECT_ALL_CHALLENGESUGGESTIONS_QUERY = 'SELECT * FROM challengeSuggestions';
+    const SELECT_ALL_CHALLENGESUGGESTIONS_QUERY = 'SELECT* FROM challengeSuggestions';
 
     app.get('/api/challengeSuggestions/View', (req, res) => {
         con.query(SELECT_ALL_CHALLENGESUGGESTIONS_QUERY, (err, results) => {

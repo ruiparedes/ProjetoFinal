@@ -1,0 +1,46 @@
+#alterCompetitionMaxParticipantsOuterDiv{
+    width: 100%;
+}
+#alterCompetitionMaxParticipantsInnerDiv{
+    width:40%;
+    margin-top: 5%;
+    margin-left: auto;
+    margin-right: auto;
+}
+#alterCompetitionMaxParticipantsForm{
+    background-color:#eee; 
+    padding-bottom: 10%;
+    border: 2px solid black;
+border-radius: 3px;
+padding-left: 5%;
+padding-right: 5%;
+}
+#addCompetitionMaxParticipantsTitle{
+    text-decoration: underline;
+}
+
+#addCompetitionButtonDiv{
+    float: right; 
+}
+
+
+
+#competitionMaxParticipantsInput{
+    font-size: 20px;
+    text-align: center;
+    background-color:#eee; 
+    border: 2px solid black;
+    border-radius: 3px;
+}
+
+#addCompButton{
+    width: 100%;
+    padding-bottom: 4%;
+    font-size: 20px;
+    text-align: center;
+    border: 2px solid black;
+    border-radius: 2px;
+    background-color:#4CAF50; 
+    border-radius: 3px;
+    padding-top: 4%;
+}

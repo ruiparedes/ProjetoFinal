@@ -1,0 +1,81 @@
+#classificationManContainer{
+    width: 100%;
+}
+#outer-management-classification-div{
+    width: 40%;
+        margin-left:auto;
+        margin-right:auto;  
+        padding-bottom: 30%;
+        margin-top: 2%; 
+}
+.divTable{
+	display: table;
+	width: 100%;
+}
+.divTableRow {
+	display: table-row;
+}
+.divTableHeading {
+	background-color: #EEE;
+	display: table-header-group;
+}
+.divTableCell, .divTableHead {
+	border: 1px solid black;
+	display: table-cell;
+	padding: 3px 10px;
+}
+.divTableBody {
+    display: table-row-group;
+}
+
+#managementclassificationclassificationNameTitle{
+    border: 1px solid black;
+	display: table-cell;
+    padding: 1%;
+    text-align: center;
+    width: 90%;
+}
+#managementclassificationclassificationNameValue{
+    border: 1px solid black;
+	display: table-cell;
+    padding: 1%;
+    text-align: center;
+}
+#managementclassificationButtonsDiv{
+    border: 1px solid black;
+	display: table-cell;
+    padding: 1%;
+    text-align: center;
+}
+#managementclassificationAddclassification{
+    border: 2px solid black;
+    border-radius: 2px;
+    background-color:#4CAF50; 
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 15px; 
+    padding: 2%;
+    margin-top: 2%; 
+}
+#managementClassDeleteButton{
+    border: 2px solid black;
+    border-radius: 2px;
+    background-color:RED; 
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 15px; 
+    padding: 2%;
+    margin-top: 2%; 
+}
+
+#addClassificationNameInput{
+
+}
+#classificationNameInput{
+    width: 50%;
+    text-align: center;
+    font-size: 20px;
+    background-color:#eee; 
+    border: 2px solid black;
+    border-radius: 3px;
+}

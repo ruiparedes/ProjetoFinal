@@ -1,0 +1,64 @@
+#alterCompetitionStatusOuterDiv{
+    width:100%
+}
+#alterCompetitionStatusInnerDiv{
+    display: table;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 3%;
+}
+
+#alterCompetitionStatusSelectForm{
+    border: 2px solid black;
+    padding: 0px 10px;
+    text-align: center;
+    width: 100%;
+    padding-bottom: 2%;
+}
+
+#selectNewStatus{
+    background-color: aquamarine;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    width: 25%;
+    font-size: 20px;
+    cursor: pointer;
+    border: 2px solid black;
+    border-radius: 2%;
+}
+
+#alterCompetitionStatusButtonDiv{
+    float: right;
+    margin-bottom: 2%;
+
+}
+#alterCompStatusButtonDiv{
+    width: 100%;
+    padding-bottom: 4%;
+    font-size: 20px;
+    text-align: center;
+    border: 2px solid black;
+    border-radius: 2px;
+    background-color:#4CAF50; 
+    border-radius: 3px;
+    padding-top: 4%;
+    cursor: pointer;
+}
+#alterCompetitionStatusKeepButtonDiv{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#alterCompStatusKeepButtonDiv{
+    width: 100%;
+    padding-bottom: 4%;
+    font-size: 20px;
+    text-align: center;
+    border: 2px solid black;
+    border-radius: 2px;
+    background-color:#4CAF50; 
+    border-radius: 3px;
+    padding-top: 4%;
+    cursor: pointer;
+}
