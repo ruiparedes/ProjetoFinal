@@ -13,11 +13,7 @@ class Challenge extends React.Component {
         var challengeLink = this.props.location.state.challengeLink;
         var competitionID = this.props.location.state.competitionID;
         var link =challengeLink.substr(14, challengeLink.length);
-        console.log(challengeName);
-        console.log(challengeID);
-        console.log(challengeLink);
-        console.log(competitionID);
-        console.log(link);
+
 
         const values = queryString.parse(this.props.location.search);
 

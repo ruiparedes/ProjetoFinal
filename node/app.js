@@ -401,7 +401,6 @@ async function doLoopThroughParticipantsAndChallenges(participants, challenges, 
                         mnts = mnts % 60;
                         days = Math.floor(hours / 24);
                         hours = hours % 24;
-                        console.log(days + " days, " + hours + " Hrs, " + mnts + " Minutes, " + seconds + " Seconds");
                         var timeInDays = days + " day(s) " + hours + " hour(s) " + mnts + " Minute(s) " + seconds + " Second(s)";
                         timeinDays = timeInDays.toString()
                     }
@@ -518,7 +517,7 @@ con.connect(function (err) {
     });
 
 
-    var CompetitionsTb = "CREATE TABLE if not exists competitions (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL UNIQUE, maxParticipants INT(2) NOT NULL, maxScore int(3), startDate DATETIME, endDate DATETIME, totalParticipants int(2), statusID INT(1) NOT NULL, FOREIGN KEY (statusID) references status(id))";
+    var CompetitionsTb = "CREATE TABLE if not exists competitions (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(70) NOT NULL UNIQUE, maxParticipants INT(2) NOT NULL, maxScore int(3), startDate DATETIME, endDate DATETIME, totalParticipants int(2), statusID INT(1) NOT NULL, FOREIGN KEY (statusID) references status(id))";
     con.query(CompetitionsTb, function (err, result) {
         if (err) throw err;
         console.log("Table Competitions Created");
@@ -542,7 +541,7 @@ con.connect(function (err) {
         console.log("Table SubClassification Created");
     });
 
-    var ChallengesTb = "CREATE TABLE if not exists challenges (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50) NOT NULL UNIQUE, description VARCHAR(5000) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(100) NOT NULL, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id) , FOREIGN KEY (classificationID) REFERENCES classifications(id))";
+    var ChallengesTb = "CREATE TABLE if not exists challenges (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(70) NOT NULL UNIQUE, description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(50) NOT NULL, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id) , FOREIGN KEY (classificationID) REFERENCES classifications(id))";
     con.query(ChallengesTb, function (err, result) {
         if (err) throw err;
         console.log("Table Challenges Created");
@@ -566,7 +565,7 @@ con.connect(function (err) {
         console.log("Table Questions Created");
     });
 
-    var QuizzTb = "CREATE TABLE if not exists quizzes (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(30), year INT(4) NOT NULL, numberQuestions INT(3), difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id))";
+    var QuizzTb = "CREATE TABLE if not exists quizzes (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(30), year DATE NOT NULL, numberQuestions INT(3), difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id))";
     con.query(QuizzTb, function (err, result) {
         if (err) throw err;
         console.log("Table Quizzes Created");
@@ -599,7 +598,7 @@ con.connect(function (err) {
         console.log("Table QuestionSuggestions Created");
     });
 
-    var ChallengeSuggestionsTb = "CREATE TABLE if not exists challengeSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL , name VARCHAR(100), description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(100) NOT NULL, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id), FOREIGN KEY (userID) REFERENCES users(id), statusID INT(1) NOT NULL, FOREIGN KEY (statusID) REFERENCES suggestionsStatus(id), FOREIGN KEY (classificationID) REFERENCES classifications(id))";
+    var ChallengeSuggestionsTb = "CREATE TABLE if not exists challengeSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL , name VARCHAR(100), description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(50) NOT NULL, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id), FOREIGN KEY (userID) REFERENCES users(id), statusID INT(1) NOT NULL, FOREIGN KEY (statusID) REFERENCES suggestionsStatus(id), FOREIGN KEY (classificationID) REFERENCES classifications(id))";
     con.query(ChallengeSuggestionsTb, function (err, result) {
         if (err) throw err;
         console.log("Table ChallengeSuggestions Created");
@@ -630,29 +629,7 @@ con.connect(function (err) {
     });
 
 
-    //UPDATE COMPETITION STATUS
 
-    app.post('/api/competitions/updateStatus', (req, res) => {
-
-        const competitionID = req.body.competitionID;
-        const statusID = req.body.statusID;
-
-
-        const UPDATE_COMPETITION_STATUS_QUERY = `UPDATE competitions SET statusID = ${statusID} where id = ${competitionID}`;
-        con.query(UPDATE_COMPETITION_STATUS_QUERY, (err, results) => {
-            if (err) {
-                console.log(err);
-                return res.status(400).json({
-                    message: 'Failed to change competition status'
-                })
-            }
-            else {
-                return res.status(200).json({
-                    message: 'Changed the Competition Status sucessfully'
-                })
-            }
-        });
-    });
 
 
 
@@ -783,6 +760,30 @@ con.connect(function (err) {
             else {
                 return res.status(200).json({
                     message: 'Sucessfully updated the Competition end date'
+                })
+            }
+        });
+    });
+
+    //UPDATE COMPETITION STATUS
+
+    app.post('/api/competitions/updateStatus', (req, res) => {
+
+        const competitionID = req.body.competitionID;
+        const statusID = req.body.statusID;
+
+
+        const UPDATE_COMPETITION_STATUS_QUERY = `UPDATE competitions SET statusID = ${statusID} where id = ${competitionID}`;
+        con.query(UPDATE_COMPETITION_STATUS_QUERY, (err, results) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({
+                    message: 'Failed to change competition status'
+                })
+            }
+            else {
+                return res.status(200).json({
+                    message: 'Changed the Competition Status sucessfully'
                 })
             }
         });
@@ -969,7 +970,7 @@ con.connect(function (err) {
                             })
                         }
                     });
-                }else{
+                } else {
                     return res.status(400).json({
                         message: 'Challenge in Use'
                     })
@@ -1002,7 +1003,6 @@ con.connect(function (err) {
             }
         })
     })
-
 
     //Get challengesPerCompetition
     const SELECT_ALL_CHALLENGESPERCOMPETITION_QUERY = 'SELECT * FROM challengesPerCompetition';
@@ -1134,6 +1134,34 @@ con.connect(function (err) {
         });
     });
 
+    //Get Registration Info by competition and user
+    app.get('/api/registrations/participantInfo/:competitionID/:userID', (req, res) => {
+        const competitionID = req.params.competitionID;
+        const userID = req.params.userID;
+        const GET_PARTICIPANT_ID_QUERY = `SELECT id from registrations where userID = ${userID} and competitionID = ${competitionID}`;
+        con.query(GET_PARTICIPANT_ID_QUERY, (err, participantInfo) => {
+            if (err) {
+                return res.send(err);
+            }
+            else {
+                let participantID = participantInfo[0].id;
+                const SELECT_PARTICIPANT_TOTAL_SCORE_QUERY = `SELECT * from registrations where id = ${participantID}`;
+                con.query(SELECT_PARTICIPANT_TOTAL_SCORE_QUERY, (err, particiapantInfo) => {
+                    if (err) {
+                        return res.send(err);
+                    }
+                    else {
+                        return res.json({
+                            participantInfo: particiapantInfo[0]
+                        })
+                    }
+                })
+
+            }
+        })
+
+    })
+
     //Add REGISTRATIONS
 
     app.post('/api/registrations/Add', (req, res) => {
@@ -1245,35 +1273,6 @@ con.connect(function (err) {
         })
 
 
-
-    })
-
-
-
-    app.get('/api/registrations/participantInfo/:competitionID/:userID', (req, res) => {
-        const competitionID = req.params.competitionID;
-        const userID = req.params.userID;
-        const GET_PARTICIPANT_ID_QUERY = `SELECT id from registrations where userID = ${userID} and competitionID = ${competitionID}`;
-        con.query(GET_PARTICIPANT_ID_QUERY, (err, participantInfo) => {
-            if (err) {
-                return res.send(err);
-            }
-            else {
-                let participantID = participantInfo[0].id;
-                const SELECT_PARTICIPANT_TOTAL_SCORE_QUERY = `SELECT * from registrations where id = ${participantID}`;
-                con.query(SELECT_PARTICIPANT_TOTAL_SCORE_QUERY, (err, particiapantInfo) => {
-                    if (err) {
-                        return res.send(err);
-                    }
-                    else {
-                        return res.json({
-                            participantInfo: particiapantInfo[0]
-                        })
-                    }
-                })
-
-            }
-        })
 
     })
 
