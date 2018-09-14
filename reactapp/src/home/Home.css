@@ -1,4 +1,44 @@
-#home-container{
-    padding-top: 50px;
-    text-align: center;
+#home-outer-div{
+  width: 100%;
+}
+#homeTitleDiv{
+text-align: center;
+}
+#homeSubTitleDiv{
+  text-align: center;
   }
+#home-container{
+  width:80%;
+  margin-top: 2%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  display: inline-flex;
+  padding-left: 32%;
+  }
+#homeCompetitions{
+  border-style: solid;
+    border-width: 3px;
+    border-radius: 5px;
+    width: 20%;
+    padding-bottom: 2%;
+    box-shadow: 5px 10px;
+    cursor: pointer;
+}
+#homeCompetitionIcon{
+  width: 50%;
+}
+#homeSuggestions{
+  border-style: solid;
+    border-width: 3px;
+    border-radius: 5px;
+    width: 20%;
+    padding-bottom: 2%;
+    box-shadow: 5px 10px;
+    cursor: pointer;
+    margin-left: 3%;
+}
+
+#centerDiv{
+text-align: center;
+}

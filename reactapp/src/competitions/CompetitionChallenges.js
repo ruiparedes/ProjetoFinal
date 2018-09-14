@@ -106,19 +106,17 @@ class CompetitionChallenges extends Component {
         console.log(this.state.competitionChallenges);
         return (
             <div id="outer-div">
-                <div id="competitionNameDiv"><h1>{this.state.competitionInfo.name}</h1></div>
+                <div id="competitionNameDiv"><h1 id ="competitionChallengesCompetitionName">{this.state.competitionInfo.name}</h1></div>
                 <div id="competitionStatusDiv"><h2>Status: {this.state.competitionInfo.statusName}</h2></div>
                 <div id="competitionScoreDiv"><h3>Total Score: {this.state.participantInfo.finalScore}/{this.state.competitionInfo.maxScore}</h3></div>
                 {this.state.competitionChallenges.map((challenge, challengeIndex) => (
                     <div id="challengeInfoDiv" onClick = {() => {this.enterChallenge(challenge.challengeID, challenge.name, challenge.link)}}>
-
                         <div id="challengeNameDiv"><p>{challenge.name}</p></div>
                         {this.state.challengesDone.length == 0 ? <div id="ScoreAndTimeDiv"><div id="challengeScoreDiv"><p>Score: 0/{challenge.challengePoints}</p></div><div id="challengeTimeDiv"><p>Time: 0</p></div></div>
                             : <div>{this.state.challengesDone.map((challengeDone, challengeDoneIndex) => (
                                 <div> {challenge.id == challengeDone.id ? <div id="ScoreAndTimeDiv"><div id="challengeScoreDiv"><p>Score: {challengeDone.score}/{challenge.challengePoints}</p></div> <div id="challengeTimeDiv"><p>Time: {challengeDone.time}</p></div></div>
                                     : <div id="ScoreAndTimeDiv"><div id="challengeScoreDiv"><p>Score: 0/{challenge.challengePoints}</p></div> <div id="challengeTimeDiv"><p>Time: 0</p></div></div>}</div>
                             ))}</div>}
-
                         <div id="challengeDifficultyDiv"><p>Difficulty: {challenge.level}</p></div>
                         <div id="challengeTypeDiv"><p>Type: {challenge.classification}</p></div>
                     </div>

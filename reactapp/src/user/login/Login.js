@@ -2,8 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom'
 import './Login.css';
 import { URL } from '../../shared/Constants';
-import Notifications, {notify} from 'react-notify-toast';
+import Notifications, { notify } from 'react-notify-toast';
 import { Redirect } from 'react-router-dom';
+import loginIcon from '../../images/loginIcon.png'
 
 class Login extends React.Component {
 
@@ -15,8 +16,13 @@ class Login extends React.Component {
         }
 
         this.login = this.login.bind(this);
+        this.goToSignUp = this.goToSignUp.bind(this);
         this.onChange = this.onChange.bind(this);
     }
+
+goToSignUp(){
+window.location.href = URL + ":3000/signup";
+}
 
 
     login() {
@@ -27,7 +33,10 @@ class Login extends React.Component {
             }
             fetch(URL + ':8080/api/users/Login', {
                 method: 'POST',
-                body: JSON.stringify(data),
+                body: JSON.stringify({
+                    username: this.state.username,
+                    password: this.state.password
+                }),
                 headers: new Headers({
                     'Content-Type': 'application/json'
                 })
@@ -37,21 +46,21 @@ class Login extends React.Component {
                 console.log(object.body.headers);
                 if (object.status === 200) {
                     fetch(URL + ':8080/api/users/View').then(res => res.json()).
-						then(d => {
+                        then(d => {
                             console.log(d);
-							d.users.filter((users) => {
-								if (users.username === data.username) {
+                            d.users.filter((users) => {
+                                if (users.username === data.username) {
                                     window.location.href = URL + ":3000/home";
-                                    console.log('Filter ' + users.username + ' ' + users.id + ' ' + users.password + ' ' + users.email + ' ' +users.address);
-									const userData = { id: users.id, username: users.username, email: users.email, address: users.address };
-									localStorage.setItem('userData', JSON.stringify(userData));
-									return;
-								}
-							})
+                                    console.log('Filter ' + users.username + ' ' + users.id + ' ' + users.password + ' ' + users.email + ' ' + users.address);
+                                    const userData = { id: users.id, username: users.username, email: users.email, address: users.address };
+                                    localStorage.setItem('userData', JSON.stringify(userData));
+                                    return;
+                                }
+                            })
                         })
-                        notify.show('LOGIN DONE!!');
+                    notify.show('LOGIN DONE!!');
                 }
-                else{
+                else {
                     notify.show('Username or Password incorrect!!');
                 }
             })
@@ -61,24 +70,23 @@ class Login extends React.Component {
 
     onChange(e) {
         this.setState({ [e.target.className]: e.target.value });
-        console.log({[e.target.className]: e.target.value});
+        console.log({ [e.target.className]: e.target.value });
     }
 
 
     render() {
         return (
-            <div className="login">
-                <div id="login-container">
-                    <div className="block">
-                        <label>Username: </label>
-                        <input type="text" placeholder="Enter the Username" className="username" onChange={this.onChange} required></input>
-                    </div>
-                    <div className="block">
-                        <label>Password: </label>
-                        <input type="password" placeholder="Enter the Password" className="password" onChange={this.onChange} required></input>
-                    </div>
-                    <div className="btncontainer" >
-                        <button type="submit" value="Signup" className="acceptbtn" onClick={this.login}>Login</button>
+            <div id="login-outer-div">
+            <div id="loginIntroText"><h2>Login or create your LabSecurity Account and start hacking!</h2></div>
+                <div id="login-container">          
+                    <div id="loginForm">
+                    <div id="loginIconDiv"><img src ={loginIcon} id="loginIcon"/></div>
+                        <div id="loginUsernameDiv"><input type="text" placeholder="Username" className="username" id="loginUsernameInput" onChange={this.onChange} required></input></div>
+                        <div id="loginPasswordDiv"><input type="password" placeholder="Password" className="password" id="loginPasswordInput" onChange={this.onChange} required></input></div>
+                        <div id="loginButtonsDiv">
+                        <button type="submit" value="Login" id="loginButton" onClick={this.login}>Login</button>
+                        <button type="submit" value="SignUp" id="signUpButton" onClick={this.goToSignUp}>Sign Up</button>
+                        </div>
                     </div>
                 </div>
                 <div><Notifications /></div>

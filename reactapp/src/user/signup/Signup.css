@@ -21,3 +21,94 @@ button:hover {
     border: 1px solid #000;
     cursor: pointer;
 }   
+
+#signup-outer-div{
+    width:100%;
+}
+#signup-container{
+    width:20%;
+    margin-top: 2%;
+    margin-left: auto;
+    margin-right: auto;
+}
+#signupForm{
+    background-color:#eee; 
+    padding-bottom: 10%;
+border-radius: 3px;
+padding-left: 5%;
+padding-right: 5%;
+box-shadow: 10px 10px 5px grey;
+}
+#signupUsernameDiv{
+    text-align: center;
+}
+#signupPasswordDiv{
+    text-align: center;
+}
+#signupNameDiv{
+    text-align: center;
+}
+#signupEmailDiv{
+    text-align: center;
+}
+#signupUsernameInput{
+width: 60%;
+margin-left: auto;
+margin-right: auto;
+text-align: center;
+box-shadow: 10px 10px 5px grey;
+}
+#signupPasswordInput{
+width: 60%;
+ margin-left: auto;
+ margin-right: auto;
+text-align: center;
+box-shadow: 10px 10px 5px grey;
+}
+#signupNameInput{
+width: 60%;
+margin-left: auto;
+margin-right: auto;
+text-align: center;
+box-shadow: 10px 10px 5px grey;
+}
+#signupEmailInput{
+ width: 60%;
+ margin-left: auto;
+ margin-right: auto;
+text-align: center;
+box-shadow: 10px 10px 5px grey;
+}
+#signupIntroText{
+text-align: center;
+}
+#loginIconDiv{
+    padding-top: 5%;
+    text-align: center;
+}
+#signupButtonsDiv{
+text-align: center;
+margin-top: 5%;
+}
+#signupLoginButton{
+    width: 100px;
+    font-size: 20px;
+    text-align: center;
+    border-radius: 2px;
+    background-color:#4CAF50; 
+    border-radius: 3px;
+    cursor: pointer;
+    box-shadow: 5px 5px 2px grey;
+}
+
+#singupSignupButton{
+    width: 100px;
+    font-size: 20px;
+    text-align: center;
+    border-radius: 2px;
+    background-color:#4CAF50; 
+    border-radius: 3px;
+    cursor: pointer;
+    box-shadow: 5px 5px 2px grey;
+    margin-right: 5%;
+}

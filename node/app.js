@@ -541,7 +541,7 @@ con.connect(function (err) {
         console.log("Table SubClassification Created");
     });
 
-    var ChallengesTb = "CREATE TABLE if not exists challenges (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(70) NOT NULL UNIQUE, description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(50) NOT NULL, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id) , FOREIGN KEY (classificationID) REFERENCES classifications(id))";
+    var ChallengesTb = "CREATE TABLE if not exists challenges (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(70) NOT NULL UNIQUE, description VARCHAR(5000) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(50) NOT NULL, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id) , FOREIGN KEY (classificationID) REFERENCES classifications(id))";
     con.query(ChallengesTb, function (err, result) {
         if (err) throw err;
         console.log("Table Challenges Created");
@@ -598,7 +598,7 @@ con.connect(function (err) {
         console.log("Table QuestionSuggestions Created");
     });
 
-    var ChallengeSuggestionsTb = "CREATE TABLE if not exists challengeSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL , name VARCHAR(100), description VARCHAR(500) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(50) NOT NULL, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id), FOREIGN KEY (userID) REFERENCES users(id), statusID INT(1) NOT NULL, FOREIGN KEY (statusID) REFERENCES suggestionsStatus(id), FOREIGN KEY (classificationID) REFERENCES classifications(id))";
+    var ChallengeSuggestionsTb = "CREATE TABLE if not exists challengeSuggestions (id INT AUTO_INCREMENT PRIMARY KEY, userID INT NOT NULL , name VARCHAR(100), description VARCHAR(5000) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(50) NOT NULL, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id), FOREIGN KEY (userID) REFERENCES users(id), statusID INT(1) NOT NULL, FOREIGN KEY (statusID) REFERENCES suggestionsStatus(id), FOREIGN KEY (classificationID) REFERENCES classifications(id))";
     con.query(ChallengeSuggestionsTb, function (err, result) {
         if (err) throw err;
         console.log("Table ChallengeSuggestions Created");
@@ -933,6 +933,7 @@ con.connect(function (err) {
         const INSERT_CHALLENGE_QUERY = `INSERT INTO challenges (name, description, link, mainFile, solution, classificationID, difficultyID) VALUES('${name}', '${description}', '${link}', '${mainFile}', '${solution}' , ${classificationID}, ${difficultyID} )`;
         con.query(INSERT_CHALLENGE_QUERY, (err, results) => {
             if (err) {
+                console.log(err);
                 return res.status(400).json({
                     message: 'Failed to Add Challenge'
                 })

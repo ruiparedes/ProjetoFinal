@@ -4,6 +4,8 @@
     margin-left: auto;
     margin-right: auto;
     margin-top: 3%;
+    
+    
 }
 .divTableRow {
 	display: table-row;
@@ -13,6 +15,7 @@
 	display: table-cell;
     padding: 3px 10px;
     text-align: center;
+    
 }
 .divTableHeader{
 	border: 1px solid black;
@@ -22,7 +25,9 @@
 }
 
 #table-div {
-	display: table-row-group;
+    display: table-row-group;
+    box-shadow: 10px 10px 5px grey;
+
 }
 #divCompetitionName{
 margin-left: auto;
