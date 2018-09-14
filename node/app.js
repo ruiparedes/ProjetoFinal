@@ -535,11 +535,6 @@ con.connect(function (err) {
         console.log("Table Classification Created");
     });
 
-    var SubClassificationTb = "CREATE TABLE if not exists subClassifications (id INT AUTO_INCREMENT PRIMARY KEY, classificationID INT NOT NULL, FOREIGN KEY (classificationID) REFERENCES classifications(id) , name VARCHAR(50) NOT NULL UNIQUE )";
-    con.query(SubClassificationTb, function (err, result) {
-        if (err) throw err;
-        console.log("Table SubClassification Created");
-    });
 
     var ChallengesTb = "CREATE TABLE if not exists challenges (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(70) NOT NULL UNIQUE, description VARCHAR(5000) NOT NULL, link VARCHAR(100) NOT NULL UNIQUE, mainFile VARCHAR(50) NOT NULL, solution VARCHAR(100) NOT NULL, classificationID INT NOT NULL, difficultyID INT(1) NOT NULL , FOREIGN KEY (difficultyID) REFERENCES difficulty(id) , FOREIGN KEY (classificationID) REFERENCES classifications(id))";
     con.query(ChallengesTb, function (err, result) {
@@ -1254,12 +1249,13 @@ con.connect(function (err) {
                             challenges[i] = competitionChallenges[i].id;
                         }
 
-                        const GET_CHALLENGES_DONE = `SELECT * FROM scorePerChallengePerCompetition where registrationID = ${participantID} and id IN (${challenges.join()})`;
+                        const GET_CHALLENGES_DONE = `SELECT scc.id, scc.registrationID, scc.challengesPerCompetitionID, scc.score, scc.time, cc.challengeID FROM scorePerChallengePerCompetition scc, challengesPerCompetition cc where scc.registrationID = ${participantID} and scc.challengesPerCompetitionID = cc.id and scc.id IN (${challenges.join()})`;
                         con.query(GET_CHALLENGES_DONE, (err, challengesDone) => {
                             if (err) {
                                 return res.send(err);
                             }
                             else {
+                                console.log(challengesDone);
                                 return res.json({
                                     challengesDone: challengesDone
                                 })
@@ -1437,56 +1433,6 @@ con.connect(function (err) {
             }
             else {
                 return res.send('Sucessfully Deleted the classification')
-            }
-        });
-    });
-
-    //--------------------------------------------------------------------------------------------------------------------
-
-    // subClassifications METHODS -------------------------------------------------------------------------------------------------------------------------------------
-
-    //Get subClassifications
-    const SELECT_ALL_SUBCLASSIFICATIONS_QUERY = 'SELECT * FROM subClassifications';
-
-    app.get('/api/subClassifications/View', (req, res) => {
-        con.query(SELECT_ALL_SUBCLASSIFICATIONS_QUERY, (err, results) => {
-            if (err) {
-                return res.send(err)
-            }
-            else {
-                return res.json({
-                    subClassifications: results
-                })
-            }
-        });
-    });
-
-    //Add subClassifications
-
-    app.post('/api/subClassifications/Add', (req, res) => {
-        const { classificationID, name } = req.body;
-        const INSERT_SUBCLASSIFICATION_QUERY = `INSERT INTO subClassifications (classificationID, name) VALUES(${classificationID}, '${name}')`;
-        con.query(INSERT_SUBCLASSIFICATION_QUERY, (err, results) => {
-            if (err) {
-                return res.send(err)
-            }
-            else {
-                return res.send('Sucessfully added a subClassification')
-            }
-        });
-    });
-
-    //Delete subClassifications
-
-    app.post('/api/subClassifications/Delete', (req, res) => {
-        const id = req.body.id;
-        const DELETE_SUBCLASSIFICATION_QUERY = `DELETE FROM subClassifications WHERE id = ${id}`;
-        con.query(DELETE_SUBCLASSIFICATION_QUERY, (err, results) => {
-            if (err) {
-                return res.send(err)
-            }
-            else {
-                return res.send('Sucessfully Deleted the subClassification')
             }
         });
     });

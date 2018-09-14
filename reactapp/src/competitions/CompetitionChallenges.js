@@ -114,7 +114,7 @@ class CompetitionChallenges extends Component {
                         <div id="challengeNameDiv"><p>{challenge.name}</p></div>
                         {this.state.challengesDone.length == 0 ? <div id="ScoreAndTimeDiv"><div id="challengeScoreDiv"><p>Score: 0/{challenge.challengePoints}</p></div><div id="challengeTimeDiv"><p>Time: 0</p></div></div>
                             : <div>{this.state.challengesDone.map((challengeDone, challengeDoneIndex) => (
-                                <div> {challenge.id == challengeDone.id ? <div id="ScoreAndTimeDiv"><div id="challengeScoreDiv"><p>Score: {challengeDone.score}/{challenge.challengePoints}</p></div> <div id="challengeTimeDiv"><p>Time: {challengeDone.time}</p></div></div>
+                                <div> {challenge.id == challengeDone.challengeID ? <div id="ScoreAndTimeDiv"><div id="challengeScoreDiv"><p>Score: {challengeDone.score}/{challenge.challengePoints}</p></div> <div id="challengeTimeDiv"><p>Time: {challengeDone.time}</p></div></div>
                                     : <div id="ScoreAndTimeDiv"><div id="challengeScoreDiv"><p>Score: 0/{challenge.challengePoints}</p></div> <div id="challengeTimeDiv"><p>Time: 0</p></div></div>}</div>
                             ))}</div>}
                         <div id="challengeDifficultyDiv"><p>Difficulty: {challenge.level}</p></div>
