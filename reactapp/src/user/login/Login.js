@@ -40,10 +40,10 @@ window.location.href = URL + ":3000/signup";
                 headers: new Headers({
                     'Content-Type': 'application/json'
                 })
-            }).then((object) => {
+            }).then(res => res.json().then(data => ({status: res.status, body: data})))
+            .then(object =>{
                 console.log(object);
                 console.log(object.status);
-                console.log(object.body.headers);
                 if (object.status === 200) {
                     fetch(URL + ':8080/api/users/View').then(res => res.json()).
                         then(d => {

@@ -697,9 +697,8 @@ con.connect(function (err) {
         con.query(CHECK_USER_EMAIL_QUERY, (err, results) => {
             if (err) {
                 console.log("Error Ocurred", err);
-                res.send({
-                    "code": 400,
-                    "failed": "error ocurred"
+                return res.status(400).json({
+                    message: 'Failed to Login'
                 })
             }
             else {
@@ -708,11 +707,20 @@ con.connect(function (err) {
                     console.log('length >0');
                     if (results[0].password == password) {
                         console.log('The Password Matches');
-                        res.send({
-                            "code": 200,
-                            "success": "login sucessfull"
-                        });
+                        return res.status(200).json({
+                            message: 'Successfully Logged In'
+                        })
                     }
+                    else{
+                        return res.status(400).json({
+                            message: 'Failed to Login',
+                        })
+                    }
+                }
+                else{
+                    return res.status(400).json({
+                        message: 'Failed to Login'
+                    })
                 }
             }
         });
