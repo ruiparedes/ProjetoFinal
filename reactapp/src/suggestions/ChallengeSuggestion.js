@@ -121,10 +121,17 @@ class ChallengeSuggestion extends Component {
     }
 
     render() {
+
+        if(localStorage.getItem('userData') == null){
+            return <Redirect to={{
+                pathname: '/login'
+            }} />
+        }
+
         return (
             <div>
                 <div id="addChallengeOuterDiv">
-                <div id="addChallengeInnerDiv"><h1>Create Challenge</h1>
+                <div id="addChallengeInnerDiv"><h1>Suggest a new Challenge</h1>
                     <div id="addChallengeFormDiv">
                         <div id="addChallengeNameTitle"><h2>Challenge Name:</h2></div>
                         <div id="addChallengeNameInput"> <input type="text" placeholder="Enter the Challenge Name" id="challengeNameInput" className="challengeName" onChange={this.onChange} required></input></div>

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './AddCompetitionChallenges.css';
 import { URL } from '../../shared/Constants';
 import { Route, Redirect } from 'react-router-dom';
+let localUser = JSON.parse(localStorage.getItem('userData'));
 
 class AddCompetitionChallenges extends Component {
     constructor(props) {
@@ -109,6 +110,15 @@ class AddCompetitionChallenges extends Component {
             return <Redirect to={{
                 pathname: '/management/competitions/alterCompetitionStatus',
                 state: {competitionID: this.props.location.state.competitionID, competitionName: this.state.competitionInfo.name, competitionCurrentStatus: this.state.competitionInfo.statusName},
+            }} />
+        }
+        else if(localStorage.getItem('userData') == null){
+            return <Redirect to={{
+                pathname: '/login'
+            }} />
+        }else if(localUser.role != 'admin'){
+            return <Redirect to={{
+                pathname: '/noAuthority'
             }} />
         }
 

@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom'
 import './Signup.css';
 import Notifications, { notify } from 'react-notify-toast';
 import { URL } from '../../shared/Constants';
-import loginIcon from '../../images/loginIcon.png'
+import loginIcon from '../../images/loginIcon.png';
+import { Route, Redirect } from 'react-router-dom';
 
 class Signup extends React.Component {
 
@@ -13,8 +14,7 @@ class Signup extends React.Component {
             username: '',
             password: '',
             name: '',
-            email: '',
-            address: ''
+            email: ''
         }
         this.signup = this.signup.bind(this);
         this.goToLogin = this.goToLogin.bind(this);
@@ -22,27 +22,29 @@ class Signup extends React.Component {
     }
 
     signup() {
-        if (this.state.username && this.state.password && this.state.name && this.state.email && this.state.address) {
+        if (this.state.username && this.state.password && this.state.name && this.state.email) {
             fetch(URL + ':8080/api/users/Add/', {
                 method: 'POST',
                 body: JSON.stringify({
                     username: this.state.username,
                     password: this.state.password,
                     name: this.state.name,
-                    email: this.state.email,
-                    address: this.state.address
+                    email: this.state.email
                 }),
                 headers: new Headers({
                     'Content-Type': 'application/json'
                 })
             }).then((object) => {
                 if (object.status === 200) {
-                    notify.show('Signup Done');
+                    notify.show('Account created Successfully, You can now Log in');
                 }
                 else {
                     notify.show('Couldnt Signup');
                 }
             })
+        }
+        else{
+            notify.show(`There are some empty fields, please fill in every field`);
         }
     }
 
@@ -55,6 +57,11 @@ class Signup extends React.Component {
     }
 
     render() {
+        if(localStorage.getItem('userData') != null){
+            return <Redirect to={{
+                pathname: '/home'
+            }} />
+        }
         return (
             <div id="signup-outer-div">
                 <div id="signupIntroText"><h2>Create an account or if you already have one Log in!</h2></div>

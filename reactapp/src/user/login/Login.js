@@ -4,7 +4,7 @@ import './Login.css';
 import { URL } from '../../shared/Constants';
 import Notifications, { notify } from 'react-notify-toast';
 import { Redirect } from 'react-router-dom';
-import loginIcon from '../../images/loginIcon.png'
+import loginIcon from '../../images/loginIcon.png';
 
 class Login extends React.Component {
 
@@ -51,8 +51,8 @@ window.location.href = URL + ":3000/signup";
                             d.users.filter((users) => {
                                 if (users.username === data.username) {
                                     window.location.href = URL + ":3000/home";
-                                    console.log('Filter ' + users.username + ' ' + users.id + ' ' + users.password + ' ' + users.email + ' ' + users.address);
-                                    const userData = { id: users.id, username: users.username, email: users.email, address: users.address };
+                                    console.log('Filter ' + users.username + ' ' + users.id + ' ' + users.password + ' ' + users.email + ' ' + users.role);
+                                    const userData = { id: users.id, username: users.username, email: users.email, role: users.role };
                                     localStorage.setItem('userData', JSON.stringify(userData));
                                     return;
                                 }
@@ -75,6 +75,13 @@ window.location.href = URL + ":3000/signup";
 
 
     render() {
+
+        if(localStorage.getItem('userData') != null){
+            return <Redirect to={{
+                pathname: '/home'
+            }} />
+        }
+
         return (
             <div id="login-outer-div">
             <div id="loginIntroText"><h2>Login or create your LabSecurity Account and start hacking!</h2></div>

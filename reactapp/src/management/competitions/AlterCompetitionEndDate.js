@@ -3,6 +3,7 @@ import './AlterCompetitionEndDate.css';
 import Notifications, {notify} from 'react-notify-toast';
 import { Route, Redirect } from 'react-router-dom';
 import { URL } from '../../shared/Constants';
+let localUser = JSON.parse(localStorage.getItem('userData'));
 
 class AlterCompetitionEndDate extends Component {
 
@@ -54,6 +55,16 @@ class AlterCompetitionEndDate extends Component {
               pathname: "/management/competitions"
             }}
           />  
+        }
+        else if(localStorage.getItem('userData') == null){
+            return <Redirect to={{
+                pathname: '/login'
+            }} />
+        }
+        else if(localUser.role != 'admin'){
+            return <Redirect to={{
+                pathname: '/noAuthority'
+            }} />
         }
 
 

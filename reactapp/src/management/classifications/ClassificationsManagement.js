@@ -3,6 +3,7 @@ import { URL } from '../../shared/Constants';
 import { Route, Redirect } from 'react-router-dom';
 import Notifications, {notify} from 'react-notify-toast';
 import './ClassificationsManagement.css';
+let localUser = JSON.parse(localStorage.getItem('userData'));
 
 class ClassificationsManagement extends Component {
 
@@ -79,6 +80,17 @@ class ClassificationsManagement extends Component {
 
 
     render() {
+        if(localStorage.getItem('userData') == null){
+            return <Redirect to={{
+                pathname: '/login'
+            }} />
+        }
+        else if(localUser.role != 'admin'){
+            return <Redirect to={{
+                pathname: '/noAuthority'
+            }} />
+        }
+
         return (
             <div id="classificationManContainer">
                 <div id="outer-management-classification-div">

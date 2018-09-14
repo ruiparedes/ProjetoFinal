@@ -65,6 +65,13 @@ class SuggestionsManagement extends Component {
 
 
     render() {
+
+         if(localStorage.getItem('userData') == null){
+            return <Redirect to={{
+                pathname: '/login'
+            }} />
+        }
+
         return (
             <div id="challengeManContainer">
                 <div id="outer-management-challenge-div">

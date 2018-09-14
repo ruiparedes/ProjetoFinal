@@ -667,8 +667,9 @@ con.connect(function (err) {
     //Add User
 
     app.post('/api/users/Add', (req, res) => {
-        const { username, password, name, email, role } = req.body;
-        console.log(username, password, name, role);
+        const { username, password, name, email} = req.body;
+        console.log(username, password, name);
+        const role = 'player';
         const INSERT_USER_QUERY = `INSERT INTO users (username, password, name, email, role, creationDate) VALUES('${username}', '${password}', '${name}', '${email}', '${role}', DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') )`;
         con.query(INSERT_USER_QUERY, (err, results) => {
             if (err) {

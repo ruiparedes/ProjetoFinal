@@ -104,6 +104,11 @@ class CompetitionsList extends React.Component {
             }} />
         }
 
+        else if(localStorage.getItem('userData') == null){
+            window.location.href = URL + ":3000/login";
+        }
+
+
         return (
             
             <div>

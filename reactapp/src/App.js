@@ -31,6 +31,8 @@ import AddChallenge from "./management/challenges/AddChallenge";
 import ClassificationsManagement from './management/classifications/ClassificationsManagement';
 import SuggestionsManagement from './management/suggestions/SuggestionsManagement';
 
+import noAuthority from './supportComponents/noAuthority';
+
 class App extends React.Component {
   render() {
     return (
@@ -63,6 +65,8 @@ class App extends React.Component {
 
               <Route exact path="/management/classifications" component={ClassificationsManagement} />
               <Route exact path="/management/suggestions" component={SuggestionsManagement} />
+
+              <Route exact path="/noAuthority" component={noAuthority} />
 
             </Switch>
           </div>

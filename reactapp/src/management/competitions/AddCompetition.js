@@ -3,6 +3,7 @@ import { URL } from '../../shared/Constants';
 import './AddCompetition.css';
 import Notifications, {notify} from 'react-notify-toast';
 import { Route, Redirect } from 'react-router-dom';
+let localUser = JSON.parse(localStorage.getItem('userData'));
 
 
 class AddCompetition extends Component {
@@ -71,6 +72,17 @@ class AddCompetition extends Component {
             }}
           />  
         }
+        else if(localStorage.getItem('userData') == null){
+            return <Redirect to={{
+                pathname: '/login'
+            }} />
+        }
+        else if(localUser.role != 'admin'){
+            return <Redirect to={{
+                pathname: '/noAuthority'
+            }} />
+        }
+
 
 
         return (

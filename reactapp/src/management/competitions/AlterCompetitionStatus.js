@@ -3,6 +3,7 @@ import './AlterCompetitionStatus.css';
 import { URL } from '../../shared/Constants';
 import { Route, Redirect } from 'react-router-dom';
 import Notifications, { notify } from 'react-notify-toast';
+let localUser = JSON.parse(localStorage.getItem('userData'));
 
 class AlterCompetitionStatus extends Component {
     constructor(props) {
@@ -78,6 +79,16 @@ class AlterCompetitionStatus extends Component {
             this.setState({redirectToManagementCompetition: false});
             return <Redirect to={{
                 pathname: '/management/competitions'
+            }} />
+        }
+        else if(localStorage.getItem('userData') == null){
+            return <Redirect to={{
+                pathname: '/login'
+            }} />
+        }
+        else if(localUser.role != 'admin'){
+            return <Redirect to={{
+                pathname: '/noAuthority'
             }} />
         }
 

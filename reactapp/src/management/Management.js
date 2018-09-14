@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './Management.css';
 import { Route, Redirect } from 'react-router-dom';
+let localUser = JSON.parse(localStorage.getItem('userData'));
 
 class Management extends Component {
 
@@ -29,6 +30,18 @@ class Management extends Component {
             }}
           />  
         }
+        else if(localStorage.getItem('userData') == null){
+            return <Redirect to={{
+                pathname: '/login'
+            }} />
+        }
+        else if(localUser.role != 'admin'){
+            return <Redirect to={{
+                pathname: '/noAuthority'
+            }} />
+        }
+
+        
 
         return (
             <div id="manContainer">

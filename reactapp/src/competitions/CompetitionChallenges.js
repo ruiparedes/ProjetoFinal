@@ -100,8 +100,9 @@ class CompetitionChallenges extends Component {
             }}
           />  
         }
-
-
+        else if(localStorage.getItem('userData') == null){
+            window.location.href = URL + ":3000/login";
+        }
 
         console.log(this.state.competitionChallenges);
         return (

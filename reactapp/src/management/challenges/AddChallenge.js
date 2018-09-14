@@ -3,6 +3,7 @@ import './AddChallenge.css';
 import { URL } from '../../shared/Constants';
 import Notifications, {notify} from 'react-notify-toast';
 import { Route, Redirect } from 'react-router-dom';
+let localUser = JSON.parse(localStorage.getItem('userData'));
 
 class AddChallenge extends Component {
 
@@ -116,6 +117,11 @@ class AddChallenge extends Component {
               pathname: "/management/challenges"
             }}
           />  
+        }
+        else if(localUser.role != 'admin'){
+            return <Redirect to={{
+                pathname: '/noAuthority'
+            }} />
         }
 
         return (

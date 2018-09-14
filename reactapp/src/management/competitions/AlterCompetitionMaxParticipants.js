@@ -3,6 +3,7 @@ import Notifications, {notify} from 'react-notify-toast';
 import { Route, Redirect } from 'react-router-dom';
 import { URL } from '../../shared/Constants';
 import './AlterCompetitionMaxParticipants.css';
+let localUser = JSON.parse(localStorage.getItem('userData'));
 
 class AlterCompetitionMaxParticipants extends Component {
 
@@ -55,6 +56,17 @@ class AlterCompetitionMaxParticipants extends Component {
             }}
           />  
         }
+        else if(localStorage.getItem('userData') == null){
+            return <Redirect to={{
+                pathname: '/login'
+            }} />
+        }
+        else if(localUser.role != 'admin'){
+            return <Redirect to={{
+                pathname: '/noAuthority'
+            }} />
+        }
+
 
 
 
