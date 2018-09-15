@@ -91,6 +91,9 @@ class AlterCompetitionStatus extends Component {
                 pathname: '/noAuthority'
             }} />
         }
+        else if(this.props.location.state== undefined){
+            window.location.href ="/errorManagementHandler";
+        }
 
 
         console.log(this.state.newStatus);

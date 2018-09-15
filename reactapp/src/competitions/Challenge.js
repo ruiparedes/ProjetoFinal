@@ -8,6 +8,9 @@ class Challenge extends React.Component {
         
     }
     render() {
+        if(this.props.location.state== undefined){
+            window.location.href = "/errorHandler";
+        }
         var challengeName = this.props.match.params.name;
         var challengeID = this.props.location.state.challengeID;
         var challengeLink = this.props.location.state.challengeLink;

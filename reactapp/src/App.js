@@ -33,6 +33,10 @@ import SuggestionsManagement from './management/suggestions/SuggestionsManagemen
 
 import noAuthority from './supportComponents/noAuthority';
 
+import notFound from './supportComponents/notFound'
+import errorComponent from './supportComponents/errorComponent'
+import errorManagement from './supportComponents/errorManagement'
+
 class App extends React.Component {
   render() {
     return (
@@ -67,6 +71,10 @@ class App extends React.Component {
               <Route exact path="/management/suggestions" component={SuggestionsManagement} />
 
               <Route exact path="/noAuthority" component={noAuthority} />
+              <Route exact path="/errorHandler" component={errorComponent} />
+              <Route exact path="/errorManagementHandler" component={errorManagement} />
+
+              <Route path="*" component={notFound} />
 
             </Switch>
           </div>

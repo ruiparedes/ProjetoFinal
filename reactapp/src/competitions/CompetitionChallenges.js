@@ -31,6 +31,7 @@ class CompetitionChallenges extends Component {
 
 
     componentDidMount() {
+        console.log(this.props.location);
         console.log(this.props.location.state.competitionID)
         this.setState({ competitionID: this.props.location.state.competitionID });
         this.fetchCompetitionChallenges();
@@ -102,6 +103,9 @@ class CompetitionChallenges extends Component {
         }
         else if(localStorage.getItem('userData') == null){
             window.location.href = URL + ":3000/login";
+        }
+        else if(this.props.location.state== undefined){
+            window.location.href = URL + ":3000/errorHandler";
         }
 
         console.log(this.state.competitionChallenges);
