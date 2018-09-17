@@ -50,7 +50,7 @@ window.location.href = URL + ":3000/signup";
                             console.log(d);
                             d.users.filter((users) => {
                                 if (users.username === data.username) {
-                                    window.location.href = URL + ":3000/home";
+                                    window.location.href = "/home";
                                     console.log('Filter ' + users.username + ' ' + users.id + ' ' + users.password + ' ' + users.email + ' ' + users.role);
                                     const userData = { id: users.id, username: users.username, email: users.email, role: users.role };
                                     localStorage.setItem('userData', JSON.stringify(userData));

@@ -479,6 +479,9 @@ con.connect(function (err) {
     var UsersTb = "CREATE TABLE if not exists users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(50) NOT NULL UNIQUE, password VARCHAR(20) NOT NULL, name VARCHAR(50) NOT NULL, email VARCHAR(50) NOT NULL UNIQUE, role VARCHAR(15) NOT NULL, creationDate DATETIME)";
     con.query(UsersTb, function (err, result) {
         if (err) throw err;
+        const INSERT_ADMIN_QUERY = `INSERT into users (username, password, name, email, role, creationDate) VALUES('Admin', 'admin', 'Administrator', 'admin@gmail.com', 'admin', DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'))`;
+        con.query(INSERT_ADMIN_QUERY, (err, results) => {
+        });
         console.log("Table Users Created");
     });
 
@@ -1729,8 +1732,11 @@ con.connect(function (err) {
         const statusID = 2;
         const classificationID = req.body.classificationID;
         console.log(link);
+        console.log(link.substring(link.lastIndexOf('/'), link.length));
         var fileName = link.substring(link.lastIndexOf('/'), link.length);
         var modifiedLink = '../challenges' + fileName + '/' + mainFile;
+        console.log(fileName);
+        console.log(modifiedLink);
         const ACCEPT_CHALLENGE_SUGGESTION_QUERY = `INSERT INTO challenges (name, description, link, mainFile, solution, classificationID, difficultyID) VALUES('${name}', '${description}', '${modifiedLink}', '${mainFile}', '${solution}', ${classificationID}, ${difficultyID}) `;
         con.query(ACCEPT_CHALLENGE_SUGGESTION_QUERY, (err, results) => {
             if (err) {

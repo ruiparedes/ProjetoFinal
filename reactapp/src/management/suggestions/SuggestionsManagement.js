@@ -44,7 +44,7 @@ class SuggestionsManagement extends Component {
     }
 
     acceptSuggestion(suggestionID, name, description, link, mainFile, solution, classificationID, difficultyID) {
-
+console.log(link);
         fetch(URL + ':8080/api/challengeSuggestions/Accept', {
             method: 'POST',
             body: JSON.stringify({

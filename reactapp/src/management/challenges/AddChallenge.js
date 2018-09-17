@@ -71,7 +71,7 @@ class AddChallenge extends Component {
 
     addChallenge() {
         if (this.state.challengeName!=null && this.state.description !=null && this.state.folderName !=null && this.state.mainFile !=null && this.state.selectedClassificationID !=null && this.state.selectedDifficultyID !=null && this.state.solution !=null) {
-            const link = '..challenges/'+this.state.folderName+'/'+this.state.mainFile;
+            const link = '../challenges/'+this.state.folderName+'/'+this.state.mainFile;
             fetch(URL + ':8080/api/challenges/Add', {
                 method: 'POST',
                 body: JSON.stringify({
