@@ -626,6 +626,23 @@ con.connect(function (err) {
         });
     });
 
+    app.get('/api/statusOneAndTwo/View', (req, res) => {
+
+        const SELECT_STATUS_1or2_QUERY = `SELECT * FROM status where id=1 or id=2`;
+        con.query(SELECT_STATUS_1or2_QUERY, (err, results) => {
+            if (err) {
+                console.log(err);
+                return res.send(err)
+            }
+            else {
+                console.log(results);
+                return res.json({
+                    status: results
+                })
+            }
+        });
+    });
+
 
 
 
@@ -778,9 +795,8 @@ con.connect(function (err) {
 
         const competitionID = req.body.competitionID;
         const statusID = req.body.statusID;
-
-
-        const UPDATE_COMPETITION_STATUS_QUERY = `UPDATE competitions SET statusID = ${statusID} where id = ${competitionID}`;
+        if(statusID==2){
+            const UPDATE_COMPETITION_STATUS_QUERY = `UPDATE competitions SET statusID = ${statusID}, startDate = DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id = ${competitionID}`;
         con.query(UPDATE_COMPETITION_STATUS_QUERY, (err, results) => {
             if (err) {
                 console.log(err);
@@ -794,6 +810,25 @@ con.connect(function (err) {
                 })
             }
         });
+        }
+        else{
+             const UPDATE_COMPETITION_STATUS_QUERY = `UPDATE competitions SET statusID = ${statusID} where id = ${competitionID}`;
+        con.query(UPDATE_COMPETITION_STATUS_QUERY, (err, results) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({
+                    message: 'Failed to change competition status'
+                })
+            }
+            else {
+                return res.status(200).json({
+                    message: 'Changed the Competition Status sucessfully'
+                })
+            }
+        });
+        }
+
+       
     });
 
     //UPDATE COMPETITION MAX PARTICIPANTS

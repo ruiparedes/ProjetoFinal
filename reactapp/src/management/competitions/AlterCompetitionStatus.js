@@ -27,7 +27,7 @@ class AlterCompetitionStatus extends Component {
     }
 
     fetchAllStatus() {
-        const getAllStatus = URL + ':8080/api/status/View';
+        const getAllStatus = URL + ':8080/api/statusOneAndTwo/View';
         fetch(getAllStatus).then(res => res.json())
             .then(data => {
                 console.log(data);
