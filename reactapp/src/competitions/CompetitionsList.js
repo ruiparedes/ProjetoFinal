@@ -113,7 +113,9 @@ class CompetitionsList extends React.Component {
             
             <div>
                 {this.state.competitions.map((competition, competitionIndex) => (
-                    <div id="competitionBox" key={'competitionBox_' + competitionIndex}>
+                    <div>
+                    {competition.statusName == 'In Development' ? null :
+                <div id="competitionBox" key={'competitionBox_' + competitionIndex}>
                         <div id="competitionName"><h2>{competition.name}</h2></div>
                         <div id="competitionParticipants"><h4>Participants: {competition.totalParticipants}/{competition.maxParticipants}</h4></div>
                         <div id="competitionDates"><h4>Competition Date: {competition.startDate} / {competition.endDate}</h4></div>
@@ -124,6 +126,8 @@ class CompetitionsList extends React.Component {
                                 <div id="buttonDiv">{competition.statusName == 'Closed' ? <button type="submit" value="EnterLeaderboard" className="EnterLeaderboard" id="enterLeaderboard" onClick={() => {this.enterLeaderboard(competition.id, competition.name)}}  >Leaderboard</button>
                                 : <div></div>}</div>
                     </div>
+                }
+                   </div> 
                 ))}
             </div>
         );

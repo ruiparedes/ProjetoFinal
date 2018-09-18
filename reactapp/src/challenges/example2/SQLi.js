@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { URL } from '../../shared/Constants';
 import './SQLi.css';
+import Notifications, {notify} from 'react-notify-toast';
+let localUser = JSON.parse(localStorage.getItem('userData'));
 class SQLi extends React.Component {
 
     constructor(props) {
@@ -40,7 +42,36 @@ class SQLi extends React.Component {
             headers: new Headers({
                 'Content-Type': 'application/json'
             })
-        });
+        }).then((object) =>{
+            if(object.status ==200){
+                notify.show('Congratulations, your attack was a success!!');
+
+                var challengeID = this.props.challengeID;
+                var competitionID = this.props.competitionID;
+                var userID = localUser.id;
+
+                console.log(challengeID);
+                console.log(competitionID);
+                console.log(userID);
+
+                fetch(URL + ':8080/api/scorePerChallengePerCompetition/getScore', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        challengeID: challengeID,
+                        competitionID: competitionID,
+                        userID: userID
+                    }),
+                    headers: new Headers({
+                        'Content-Type': 'application/json'
+                    })
+                });
+                
+
+            }
+            else{
+                notify.show('Attack Failed!!');
+            }
+        })
 
     }
 
@@ -60,6 +91,7 @@ class SQLi extends React.Component {
                     </div>
                     </div>
                 </div>
+                <div><Notifications /></div>
             </div>
         );
     }

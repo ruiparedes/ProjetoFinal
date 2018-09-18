@@ -140,11 +140,18 @@ conVul.connect(function (err) {
         const LOGIN_VULN_USERS_QUERY = `SELECT username, password from users where username = '${username}' and (password = '${password}')`;
         console.log(LOGIN_VULN_USERS_QUERY);
         conVul.query(LOGIN_VULN_USERS_QUERY, (err, results) => {
-            if (results.length != 0 && username == 'admin') {
+            console.log(results);
+            if (results.length != 0 && results[0].username == 'admin') {
                 console.log("Login Realizado: " + results.length);
+                return res.status(200).json({
+                    message: 'Attack Worked'
+                })
             }
             else {
                 console.log("Falha no Login: " + results.length);
+                return res.status(400).json({
+                    message: 'Attack Failed'
+                })
             }
         })
     });

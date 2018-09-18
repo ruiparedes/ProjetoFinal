@@ -109,7 +109,7 @@ class CompetitionChallenges extends Component {
         else if (this.props.location.state == undefined) {
             window.location.href = URL + ":3000/errorHandler";
         }
-
+        console.log(this.state.challengesDone);
         console.log(this.state.competitionChallenges);
         return (
             <div id="outer-div">
@@ -120,7 +120,6 @@ class CompetitionChallenges extends Component {
                     <div>
                         {this.state.challengesDone.length == 0 ?
                             <div id="challengeInfoDiv" onClick={() => { this.enterChallenge(challenge.challengeID, challenge.name, challenge.link) }}>
-                                <div id="competitionNameDiv"><h1 id="competitionChallengesCompetitionName">{this.state.competitionInfo.name}</h1></div>
                                 <div id="challengeNameDiv"><p>{challenge.name}</p></div>
                                 <div id="challengeScoreDiv"><p>Score: 0/{challenge.challengePoints}</p></div><div id="challengeTimeDiv"><p>Time: 0</p></div>
                                 <div id="challengeDifficultyDiv"><p>Difficulty: {challenge.level}</p></div>
