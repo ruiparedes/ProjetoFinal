@@ -156,6 +156,14 @@
     cursor: pointer;
     font-size: 15px; 
 }
+#managementCompChallengesButton{
+    border: 2px solid black;
+    border-radius: 2px;
+    background-color:rosybrown; 
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 15px; 
+}
 
 #managementCompAddCompetition{
     width: 20%;

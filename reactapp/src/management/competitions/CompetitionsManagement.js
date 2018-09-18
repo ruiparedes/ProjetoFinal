@@ -15,6 +15,7 @@ class Competitions extends Component {
             redirectToAlterStatus: false,
             redirectToAlterEndDate: false,
             redirectToAlterMaxParticipants: false,
+            redirectToAddChallengesToCompetition: false,
             selectedCompetitionID:null,
             selectedCompetitionName:null,
             selectedCompetitionStatus:null
@@ -42,6 +43,9 @@ class Competitions extends Component {
 
     redirectToAddCompetitionF(){
         this.setState({redirectToAddCompetion: true});
+    }
+    redirectToAddChallengeToCompetitionF(competitionID){
+        this.setState({redirectToAddChallengesToCompetition: true, selectedCompetitionID: competitionID});
     }
     redirectToAlterStatusF(competitionID, competitionName, competitionCurrentStatus){
         this.setState({redirectToAlterStatus: true, selectedCompetitionID: competitionID, selectedCompetitionName: competitionName, selectedCompetitionStatus: competitionCurrentStatus});
@@ -84,6 +88,15 @@ class Competitions extends Component {
                 pathname: '/management/competitions/alterCompetitionMaxParticipants',
                 state: {competitionID: this.state.selectedCompetitionID, competitionName: this.state.selectedCompetitionName}
             }} />
+        }
+        else if(this.state.redirectToAddChallengesToCompetition==true){
+            this.setState({redirectToAddChallengesToCompetition: false});
+            return <Redirect
+            to={{
+              pathname: "/management/competitions/addCompetitionChallenges" ,
+              state: {competitionID: this.state.selectedCompetitionID}
+            }}
+          />  
         }
         else if(localStorage.getItem('userData') == null){
             return <Redirect to={{
@@ -128,6 +141,7 @@ class Competitions extends Component {
                                 <div id="managementCompetitionEndDateButtonDiv"><button type="submit" value="managementCompetitionEndDateButton" id="managementCompeEndDateButton" onClick={() =>{this.redirectToAlterEndDateF(competition.id, competition.name)}}>EndDate</button></div>
                                 <div id="managementCompetitionMaxParticipantsButtonDiv"><button type="submit" value="managementCompetitionMaxParticipantsButton" id="managementCompMaxParticipantsButton" onClick={() =>{this.redirectToAltermaxParticipantsF(competition.id, competition.name)}}>Max Participants</button></div>
                                 <div id="managementCompetitionStatusButtonDiv"><button type="submit" value="managementCompetitionStatusButton" id="managementCompStatusButton" onClick={() =>{this.redirectToAlterStatusF(competition.id, competition.name, competition.statusName)}} >Status</button></div>
+                                <div id="managementCompetitionStatusButtonDiv"><button type="submit" value="managementCompetitionChallengesButton" id="managementCompChallengesButton" onClick={() =>{this.redirectToAddChallengeToCompetitionF(competition.id)}} >Add Challenge</button></div>
                                 </div>
                             </div>
                             ))}
