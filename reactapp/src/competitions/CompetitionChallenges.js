@@ -17,15 +17,16 @@ class CompetitionChallenges extends Component {
             competitionInfo: [],
             participantInfo: [],
             redirectToChallenge: false,
-            challengeToEnterID:'',
-            challengeToEnterLink:'',
-            challengeToEnterName:''
+            challengeToEnterID: '',
+            challengeToEnterLink: '',
+            challengeToEnterName: ''
         }
         this.fetchCompetitionChallenges = this.fetchCompetitionChallenges.bind(this);
         this.fetchAllChallenges = this.fetchAllChallenges.bind(this);
         this.fetchCompetitionInfo = this.fetchCompetitionInfo.bind(this);
         this.fetchParticipantInfo = this.fetchParticipantInfo.bind(this);
         this.fetchChallengesDone = this.fetchChallengesDone.bind(this);
+
         this.enterChallenge = this.enterChallenge.bind(this);
     }
 
@@ -39,6 +40,7 @@ class CompetitionChallenges extends Component {
         this.fetchCompetitionInfo();
         this.fetchParticipantInfo();
         this.fetchChallengesDone();
+        
     }
 
     fetchParticipantInfo() {
@@ -83,47 +85,64 @@ class CompetitionChallenges extends Component {
     }
 
 
-    enterChallenge(challengeID, challengeName, challengeLink){
-        this.setState({challengeToEnterID: challengeID});
-        this.setState({challengeToEnterName: challengeName});  
-        this.setState({challengeToEnterLink: challengeLink});        
-        this.setState({redirectToChallenge: true});
+    enterChallenge(challengeID, challengeName, challengeLink) {
+        this.setState({ challengeToEnterID: challengeID });
+        this.setState({ challengeToEnterName: challengeName });
+        this.setState({ challengeToEnterLink: challengeLink });
+        this.setState({ redirectToChallenge: true });
     }
 
 
     render() {
-        if(this.state.redirectToChallenge==true){
-            this.setState({redirectToChallenge: false});
+        if (this.state.redirectToChallenge == true) {
+            this.setState({ redirectToChallenge: false });
             return <Redirect
-            to={{
-              pathname: "/challenge/" + this.state.challengeToEnterName,
-              state: {challengeID: this.state.challengeToEnterID, challengeLink: this.state.challengeToEnterLink, competitionID: this.props.location.state.competitionID}
-            }}
-          />  
+                to={{
+                    pathname: "/challenge/" + this.state.challengeToEnterName,
+                    state: { challengeID: this.state.challengeToEnterID, challengeLink: this.state.challengeToEnterLink, competitionID: this.props.location.state.competitionID }
+                }}
+            />
         }
-        else if(localStorage.getItem('userData') == null){
+        else if (localStorage.getItem('userData') == null) {
             window.location.href = URL + ":3000/login";
         }
-        else if(this.props.location.state== undefined){
+        else if (this.props.location.state == undefined) {
             window.location.href = URL + ":3000/errorHandler";
         }
 
         console.log(this.state.competitionChallenges);
         return (
             <div id="outer-div">
-                <div id="competitionNameDiv"><h1 id ="competitionChallengesCompetitionName">{this.state.competitionInfo.name}</h1></div>
+                <div id="competitionNameDiv"><h1 id="competitionChallengesCompetitionName">{this.state.competitionInfo.name}</h1></div>
                 <div id="competitionStatusDiv"><h2>Status: {this.state.competitionInfo.statusName}</h2></div>
                 <div id="competitionScoreDiv"><h3>Total Score: {this.state.participantInfo.finalScore}/{this.state.competitionInfo.maxScore}</h3></div>
                 {this.state.competitionChallenges.map((challenge, challengeIndex) => (
-                    <div id="challengeInfoDiv" onClick = {() => {this.enterChallenge(challenge.challengeID, challenge.name, challenge.link)}}>
-                        <div id="challengeNameDiv"><p>{challenge.name}</p></div>
-                        {this.state.challengesDone.length == 0 ? <div id="ScoreAndTimeDiv"><div id="challengeScoreDiv"><p>Score: 0/{challenge.challengePoints}</p></div><div id="challengeTimeDiv"><p>Time: 0</p></div></div>
+                    <div>
+                        {this.state.challengesDone.length == 0 ?
+                            <div id="challengeInfoDiv" onClick={() => { this.enterChallenge(challenge.challengeID, challenge.name, challenge.link) }}>
+                                <div id="competitionNameDiv"><h1 id="competitionChallengesCompetitionName">{this.state.competitionInfo.name}</h1></div>
+                                <div id="challengeNameDiv"><p>{challenge.name}</p></div>
+                                <div id="challengeScoreDiv"><p>Score: 0/{challenge.challengePoints}</p></div><div id="challengeTimeDiv"><p>Time: 0</p></div>
+                                <div id="challengeDifficultyDiv"><p>Difficulty: {challenge.level}</p></div>
+                                <div id="challengeTypeDiv"><p>Type: {challenge.classification}</p></div>
+                            </div>
                             : <div>{this.state.challengesDone.map((challengeDone, challengeDoneIndex) => (
-                                <div> {challenge.id == challengeDone.challengeID ? <div id="ScoreAndTimeDiv"><div id="challengeScoreDiv"><p>Score: {challengeDone.score}/{challenge.challengePoints}</p></div> <div id="challengeTimeDiv"><p>Time: {challengeDone.time}</p></div></div>
-                                    : <div id="ScoreAndTimeDiv"><div id="challengeScoreDiv"><p>Score: 0/{challenge.challengePoints}</p></div> <div id="challengeTimeDiv"><p>Time: 0</p></div></div>}</div>
+                                <div> {challenge.id == challengeDone.challengeID ?
+                                    <div id="challengeInfoDivDone">
+                                        <div id="challengeNameDiv"><p>{challenge.name}</p></div>
+                                        <div id="challengeScoreDiv"><p>Score: {challengeDone.score}/{challenge.challengePoints}</p></div> <div id="challengeTimeDiv"><p>Time: {challengeDone.time}</p></div>
+                                        <div id="challengeDifficultyDiv"><p>Difficulty: {challenge.level}</p></div>
+                                        <div id="challengeTypeDiv"><p>Type: {challenge.classification}</p></div>
+                                    </div>
+                                    : <div id="challengeInfoDiv" onClick={() => { this.enterChallenge(challenge.challengeID, challenge.name, challenge.link) }}>
+                                    <div id="challengeNameDiv"><p>{challenge.name}</p></div>
+                                        <div id="challengeScoreDiv"><p>Score: 0/{challenge.challengePoints}</p></div> <div id="challengeTimeDiv"><p>Time: 0</p></div>
+                                        <div id="challengeDifficultyDiv"><p>Difficulty: {challenge.level}</p></div>
+                                        <div id="challengeTypeDiv"><p>Type: {challenge.classification}</p></div>
+                                    </div>}
+                                </div>
                             ))}</div>}
-                        <div id="challengeDifficultyDiv"><p>Difficulty: {challenge.level}</p></div>
-                        <div id="challengeTypeDiv"><p>Type: {challenge.classification}</p></div>
+
                     </div>
                 ))}
             </div>

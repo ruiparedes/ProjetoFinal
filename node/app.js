@@ -1280,11 +1280,9 @@ con.connect(function (err) {
 
             }
         })
-
-
-
     })
 
+   
 
     //Get scorePerChallengePerCompetition
     const SELECT_ALL_SCOREPERCHALLENGEPERCOMPETITION_QUERY = 'SELECT * FROM scorePerChallengePerCompetition';
